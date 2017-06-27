@@ -6,7 +6,9 @@
       <module fileurl="file://$PROJECT_DIR$/SPORTSAPP-Android.iml" filepath="$PROJECT_DIR$/SPORTSAPP-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/analysis-release/analysis-release.iml" filepath="$PROJECT_DIR$/analysis-release/analysis-release.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/ecgchart/ecgchart.iml" filepath="$PROJECT_DIR$/ecgchart/ecgchart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/otadfu/otadfu.iml" filepath="$PROJECT_DIR$/otadfu/otadfu.iml" />
       <module fileurl="file://$PROJECT_DIR$/signature-pad-release/signature-pad-release.iml" filepath="$PROJECT_DIR$/signature-pad-release/signature-pad-release.iml" />
     </modules>
   </component>

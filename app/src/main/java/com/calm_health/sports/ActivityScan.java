@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.calm_health.sports.share.AppSharedPreferences;
+import com.tool.sports.com.dfutool.DfuActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -121,15 +122,23 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
+
+        Intent intent = new Intent(ActivityScan.this, DfuActivity.class);
+
+        startActivity(intent);
+        finish();
+
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(true);
+        }
 
         initView();
         _checkPermission();
     }
 
-    public void initView(){
+    public void initView() {
         deviceList = (ListView) findViewById(R.id.device_list);
         mLeDeviceListAdapter = new LeDeviceListAdapter();
         deviceList.setAdapter(mLeDeviceListAdapter);
@@ -146,13 +155,12 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
         btn_pair.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(currentBle!=null) {
+                if (currentBle != null) {
                     AppSharedPreferences.setMac(ActivityScan.this, currentBle.device.getAddress());
                     Intent intent = new Intent(ActivityScan.this, MonitorActivity.class);
                     startActivity(intent);
                     finish();
-                }
-                else{
+                } else {
                     Toast.makeText(ActivityScan.this, "Please select device.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -161,7 +169,9 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(ActivityScan.this, MonitorActivity.class);
+//                Intent intent = new Intent(ActivityScan.this, MonitorActivity.class);
+                Intent intent = new Intent(ActivityScan.this, DfuActivity.class);
+
                 startActivity(intent);
                 finish();
             }
@@ -174,17 +184,17 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
                 rotateAnimator = ObjectAnimator.ofFloat(img_rotate, View.ROTATION, new float[]{0.0F, 360.0F}).setDuration(500L);
                 rotateAnimator.setInterpolator(new LinearInterpolator());
                 rotateAnimator.setRepeatCount(-1);
-                if(rotateAnimator.isStarted())
+                if (rotateAnimator.isStarted())
                     rotateAnimator.cancel();
                 rotateAnimator.start();
 
                 tx_status.setText("Scanning nearby for devices...");
-                new Handler().postDelayed(new Runnable(){
+                new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         stopScanBLE();
                     }
-                },SCAN_DURATION);
+                }, SCAN_DURATION);
             }
         });
     }
@@ -218,7 +228,7 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
 //        if(mBluetoothAdapter() > 0)
 //            tx_status.setText("Please scan new devices.");
 //        else
-            tx_status.setText("No device found. Try again.");
+        tx_status.setText("No device found. Try again.");
     }
 
     private void initBLE() {
@@ -293,7 +303,7 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
         unCheckall();
-        currentBle= mLeDeviceListAdapter.getDevice(position);
+        currentBle = mLeDeviceListAdapter.getDevice(position);
         if (currentBle == null)
             return;
         currentPos = position;
@@ -314,8 +324,7 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
         }
 
         void addDevice(Bledevices dev) {
-            if ((dev.device.getName() != null) && (dev.device.getName().toUpperCase().contains(STR_FILTER)))
-            {
+            if ((dev.device.getName() != null) && (dev.device.getName().toUpperCase().contains(STR_FILTER))) {
                 int i;
                 int listSize = mLeDevices.size();
                 for (i = 0; i < listSize; i++) {
