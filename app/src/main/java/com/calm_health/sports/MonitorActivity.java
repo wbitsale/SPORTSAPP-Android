@@ -19,11 +19,15 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -45,7 +49,7 @@ import java.util.UUID;
 import at.grabner.circleprogress.CircleProgressView;
 
 
-public class MonitorActivity extends AppCompatActivity implements BluetoothAdapter.LeScanCallback, CalmAnalysisListener {
+public class MonitorActivity extends AppCompatActivity implements BluetoothAdapter.LeScanCallback, CalmAnalysisListener, NavigationView.OnNavigationItemSelectedListener {
     private final static String TAG = "monitoractivitylog";
     private static final int REQUEST_ENABLE_BT = 1;
     private final static int REQUEST_PERMISSION_REQ_CODE = 34; // any 8-bit number
@@ -68,8 +72,13 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monitor);
-        initGui();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        initGui();
         getDevice();
         init_calmnessModule();
         _checkPermission();
@@ -193,7 +202,9 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         mCircleCalm = (CircleProgressView) findViewById(R.id.circle_calm);
 
         mCircleMotion.setBarColor(Color.rgb(0xf9, 0xff, 0x00), Color.rgb(0x98, 0x0e, 0x00));
-        mCircleCalm.setBarColor(getColor(R.color.primary), Color.RED);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mCircleCalm.setBarColor(getColor(R.color.primary), Color.RED);
+        }
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -423,5 +434,10 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         mHrtChart.addPoint((float) v);
         Log.d(TAG, "heartrate: "+ v);
         mHrtChart.update();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
     }
 }

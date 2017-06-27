@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CALMSports.iml" filepath="$PROJECT_DIR$/CALMSports.iml" />
       <module fileurl="file://$PROJECT_DIR$/CircleProgressView/CircleProgressView.iml" filepath="$PROJECT_DIR$/CircleProgressView/CircleProgressView.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SPORTSAPP-Android.iml" filepath="$PROJECT_DIR$/SPORTSAPP-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/analysis-release/analysis-release.iml" filepath="$PROJECT_DIR$/analysis-release/analysis-release.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/ecgchart/ecgchart.iml" filepath="$PROJECT_DIR$/ecgchart/ecgchart.iml" />
