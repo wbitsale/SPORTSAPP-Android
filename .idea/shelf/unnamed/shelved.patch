@@ -1,0 +1,383 @@
+Index: app/src/main/res/anim/up_from_bottom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/anim/up_from_bottom.xml	(revision )
++++ app/src/main/res/anim/up_from_bottom.xml	(revision )
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="utf-8"?>
++<set xmlns:android="http://schemas.android.com/apk/res/android"
++    android:shareInterpolator="@android:anim/decelerate_interpolator">
++    <translate
++        android:fromXDelta="0%" android:toXDelta="0%"
++        android:fromYDelta="100%" android:toYDelta="0%"
++        android:duration="600" />
++</set>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/misc.xml	(date 1498461884000)
++++ .idea/misc.xml	(revision )
+@@ -1,5 +1,8 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
++  <component name="EntryPointsManager">
++    <entry_points version="2.0" />
++  </component>
+   <component name="NullableNotNullManager">
+     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
+     <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />
+\ No newline at end of file
+Index: app/src/main/res/anim/fade_out.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/anim/fade_out.xml	(revision )
++++ app/src/main/res/anim/fade_out.xml	(revision )
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<alpha xmlns:android="http://schemas.android.com/apk/res/android"
++    android:interpolator="@android:anim/accelerate_interpolator"
++    android:fromAlpha="1.0"
++    android:toAlpha="0.0"
++    android:fillAfter="true"
++    android:duration="1000" />
+\ No newline at end of file
+Index: app/src/main/res/anim/fade_in.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/anim/fade_in.xml	(revision )
++++ app/src/main/res/anim/fade_in.xml	(revision )
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<alpha xmlns:android="http://schemas.android.com/apk/res/android"
++    android:interpolator="@android:anim/accelerate_interpolator"
++    android:fromAlpha="0.0"
++    android:toAlpha="1.0"
++    android:duration="1000" />
+\ No newline at end of file
+Index: app/src/main/res/drawable/gradbkg.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/gradbkg.xml	(revision )
++++ app/src/main/res/drawable/gradbkg.xml	(revision )
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android"
++    android:shape="rectangle">
++    <gradient
++        android:startColor="#060a2f"
++        android:endColor="#16238f"
++        android:angle="90"/>
++</shape>
+\ No newline at end of file
+Index: app/src/main/res/layout/content_main.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/content_main.xml	(date 1498461884000)
++++ app/src/main/res/layout/content_main.xml	(revision )
+@@ -16,5 +16,4 @@
+         app:layout_constraintLeft_toLeftOf="parent"
+         app:layout_constraintRight_toRightOf="parent"
+         app:layout_constraintTop_toTopOf="parent" />
+-
+ </android.support.constraint.ConstraintLayout>
+Index: app/src/main/res/drawable/radiusbutton.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/radiusbutton.xml	(revision )
++++ app/src/main/res/drawable/radiusbutton.xml	(revision )
+@@ -0,0 +1,24 @@
++<?xml version="1.0" encoding="utf-8"?>
++<selector xmlns:android="http://schemas.android.com/apk/res/android">
++    <item android:state_pressed="true">
++        <shape android:shape="rectangle">
++            <corners android:radius="30dip" />
++            <stroke android:width="1dip" android:color="#545775" />
++            <gradient android:angle="-90" android:startColor="#545775" android:endColor="#585c82" />
++        </shape>
++    </item>
++    <item android:state_focused="true">
++        <shape android:shape="rectangle">
++            <corners android:radius="30dip" />
++            <stroke android:width="1dip" android:color="#545775" />
++            <solid android:color="#545775" />
++        </shape>
++    </item>
++    <item>
++        <shape android:shape="rectangle">
++            <corners android:radius="30dip" />
++            <stroke android:width="1dip" android:color="#535674" />
++            <gradient android:angle="-90" android:startColor="#535674" android:endColor="#535674" />
++        </shape>
++    </item>
++</selector>
+\ No newline at end of file
+Index: app/src/main/res/anim/down_from_top.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/anim/down_from_top.xml	(revision )
++++ app/src/main/res/anim/down_from_top.xml	(revision )
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="utf-8"?>
++<set xmlns:android="http://schemas.android.com/apk/res/android"
++    android:shareInterpolator="@android:anim/decelerate_interpolator">
++    <translate
++        android:fromXDelta="0%" android:toXDelta="0%"
++        android:fromYDelta="-100%" android:toYDelta="0%"
++        android:duration="600" />
++</set>
+\ No newline at end of file
+Index: app/src/main/res/values/colors.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/values/colors.xml	(date 1498461884000)
++++ app/src/main/res/values/colors.xml	(revision )
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <color name="colorPrimary">#3F51B5</color>
+-    <color name="colorPrimaryDark">#303F9F</color>
++    <color name="colorPrimary">#16238f</color>
++    <color name="colorPrimaryDark">#16238f</color>
+     <color name="colorAccent">#FF4081</color>
+ </resources>
+Index: app/src/main/res/layout/activity_login_screen.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_login_screen.xml	(revision )
++++ app/src/main/res/layout/activity_login_screen.xml	(revision )
+@@ -0,0 +1,77 @@
++<?xml version="1.0" encoding="utf-8"?>
++<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    tools:context="com.calm_health.sports.LoginScreen"
++    android:background="@drawable/gradbkg">
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"
++        android:orientation="vertical"
++        android:weightSum="10"
++        android:paddingLeft="20dip"
++        android:paddingRight="20dip">
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="0dp"
++            android:orientation="vertical"
++            android:layout_weight="5"
++            android:gravity="center">
++            <ImageView
++                android:layout_width="200dip"
++                android:layout_height="200dip"
++                android:background="@drawable/logo"/>
++        </LinearLayout>
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="0dp"
++            android:orientation="vertical"
++            android:layout_weight="2">
++        </LinearLayout>
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="0dp"
++            android:orientation="vertical"
++            android:layout_weight="3">
++            <Button
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_margin="10dip"
++                android:layout_marginLeft="30dip"
++                android:layout_marginRight="30dip"
++                android:background="@drawable/radiusbutton"
++                android:id="@+id/btn_signup"
++                android:text="Sign Up"
++                android:textSize="18dip"
++                android:textAllCaps="false"
++                android:textColor="#fff"/>
++            <Button
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_margin="10dip"
++                android:layout_marginLeft="30dip"
++                android:layout_marginRight="30dip"
++                android:background="@drawable/radiusbutton"
++                android:id="@+id/btn_login"
++                android:text="Log In"
++                android:textSize="18dip"
++                android:textAllCaps="false"
++                android:textColor="#fff"/>
++            <Button
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_margin="10dip"
++                android:layout_marginLeft="30dip"
++                android:layout_marginRight="30dip"
++                android:background="#00000000"
++                android:id="@+id/btn_guest"
++                android:text="GUEST MODE"
++                android:textSize="16dip"
++                android:textColor="#fff"/>
++        </LinearLayout>
++    </LinearLayout>
++
++
++</android.support.constraint.ConstraintLayout>
+Index: app/src/main/java/com/calm_health/sports/LoginScreen.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/calm_health/sports/LoginScreen.java	(revision )
++++ app/src/main/java/com/calm_health/sports/LoginScreen.java	(revision )
+@@ -0,0 +1,77 @@
++package com.calm_health.sports;
++
++import android.content.Intent;
++import android.os.Handler;
++import android.support.v7.app.AppCompatActivity;
++import android.os.Bundle;
++import android.view.View;
++import android.widget.Button;
++
++public class LoginScreen extends AppCompatActivity {
++    private int SPLASH_DISPLAY_TIME = 0;
++    Button btn_guest, btn_singup, btn_login;
++
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_login_screen);
++
++        btn_guest = (Button) findViewById(R.id.btn_guest);
++        btn_singup = (Button) findViewById(R.id.btn_signup);
++        btn_login = (Button) findViewById(R.id.btn_login);
++
++        btn_guest.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View view) {
++                gotoGuest();
++            }
++        });
++        btn_singup.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View view) {
++                gotoSignUp();
++            }
++        });
++        btn_login.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View view) {
++                gotoLogIn();
++            }
++        });
++    }
++    public void gotoSignUp(){
++        new Handler().postDelayed(new Runnable() {
++            public void run() {
++                Intent intent = new Intent(LoginScreen.this, Signup.class);
++                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
++                startActivity(intent);
++                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
++                LoginScreen.this.finish();
++            }
++        }, SPLASH_DISPLAY_TIME);
++    }
++    public void gotoLogIn(){
++        new Handler().postDelayed(new Runnable() {
++            public void run() {
++                Intent intent = new Intent(LoginScreen.this, Login.class);
++                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
++                startActivity(intent);
++                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
++                LoginScreen.this.finish();
++            }
++        }, SPLASH_DISPLAY_TIME);
++
++    }
++    public void gotoGuest(){
++        new Handler().postDelayed(new Runnable() {
++            public void run() {
++                Intent intent = new Intent(LoginScreen.this, Login.class);
++                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
++                startActivity(intent);
++                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
++                LoginScreen.this.finish();
++            }
++        }, SPLASH_DISPLAY_TIME);
++
++    }
++}
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/vcs.xml	(revision )
++++ .idea/vcs.xml	(revision )
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="$PROJECT_DIR$" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(date 1498461884000)
++++ app/src/main/AndroidManifest.xml	(revision )
+@@ -8,17 +8,25 @@
+         android:label="@string/app_name"
+         android:roundIcon="@mipmap/ic_launcher_round"
+         android:supportsRtl="true"
++        android:screenOrientation="portrait"
+         android:theme="@style/AppTheme">
+         <activity
+-            android:name=".MainActivity"
++            android:name=".Splash"
+             android:label="@string/app_name"
+-            android:theme="@style/AppTheme.NoActionBar">
++            android:theme="@style/AppTheme.NoActionBar"
++            >
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+-
+                 <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+         </activity>
++        <activity android:name=".MainActivity" />
++        <activity android:name=".Login"
++            android:theme="@style/AppTheme.NoActionBar" />
++        <activity android:name=".Signup"
++            android:theme="@style/AppTheme.NoActionBar"/>
++        <activity android:name=".LoginScreen"
++            android:theme="@style/AppTheme.NoActionBar"></activity>
+     </application>
+ 
+ </manifest>
+\ No newline at end of file
