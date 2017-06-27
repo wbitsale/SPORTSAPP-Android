@@ -5,7 +5,7 @@ android {
     buildToolsVersion "26.0.0"
     defaultConfig {
         applicationId "com.calm_health.sports"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -32,4 +32,5 @@ dependencies {
     compile project(':signature-pad-release')
     compile project(':analysis-release')
     compile project(':CircleProgressView')
+    compile project(':otadfu')
 }

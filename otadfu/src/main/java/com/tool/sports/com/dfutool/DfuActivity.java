@@ -118,7 +118,7 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
     private TextView mTextTitle;
     private ProgressBar mProgressBar;
 
-    private Button mSelectFileButton, mUploadButton, mConnectButton;
+    private Button  mUploadButton;
 
     private BluetoothDevice mSelectedDevice;
     private String mFilePath;
@@ -481,10 +481,10 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
 
         mDeviceNameView = (TextView) findViewById(R.id.device_name);
         mFileNameView = (TextView) findViewById(R.id.file_name);
-        mSelectFileButton = (Button) findViewById(R.id.action_select_file);
+
 
         mUploadButton = (Button) findViewById(R.id.action_upload);
-        mConnectButton = (Button) findViewById(R.id.action_connect);
+
 
         mTextPercentage = (TextView) findViewById(R.id.textviewProgress);
         mTextUploading = (TextView) findViewById(R.id.textviewUploading);
@@ -847,7 +847,9 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
             }).show();
         }
     }
+    public void onCalcelClicked(final View view) {
 
+    }
     /**
      * Callback of UPDATE/CANCEL button on DfuActivity
      */
@@ -952,8 +954,8 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
         mTextPercentage.setText(null);
         mTextUploading.setText(R.string.dfu_status_uploading);
 //		mTextUploading.setVisibility(View.VISIBLE);
-        mConnectButton.setEnabled(false);
-        mSelectFileButton.setEnabled(false);
+
+
         mUploadButton.setEnabled(true);
         mUploadButton.setText(R.string.dfu_action_upload_cancel);
     }
@@ -991,8 +993,7 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
 //		mTextUploading.setVisibility(View.INVISIBLE);
 
         mProgressBar.setIndeterminate(false);
-        mConnectButton.setEnabled(true);
-        mSelectFileButton.setEnabled(true);
+
         mUploadButton.setEnabled(false); // enable Upload Button always
         mUploadButton.setText(R.string.dfu_action_upload);
         if (clearDevice) {
