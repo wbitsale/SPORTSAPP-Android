@@ -127,7 +127,7 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
 //
 //        startActivity(intent);
 //        finish();
-
+        
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);

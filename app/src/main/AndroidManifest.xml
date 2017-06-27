@@ -20,26 +20,25 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:hardwareAccelerated="false"
+        android:theme="@style/CalmTheme">
         <activity
             android:name=".ActivityLoginScreen"
-
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ActivityScan"
-            android:hardwareAccelerated="false"/>
+            />
         <activity
             android:name=".ActivityLogin"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/CalmTheme.NoActionBar" />
         <activity
             android:name=".ActivitySignUp"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/CalmTheme.NoActionBar" />
         <activity android:name=".MainActivity" />
         <activity
             android:name=".ActivitySplash"

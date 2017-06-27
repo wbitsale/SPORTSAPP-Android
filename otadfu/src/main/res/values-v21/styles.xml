@@ -54,8 +54,7 @@
     </style>
 
     <style name="AppTheme" parent="@style/AppThemeBase">        
-        <!-- Empty -->
-        <item name="android:windowContentOverlay">@null</item>
+
     </style>
 
     <style name="AppTheme.TranslucentStatusBar">
