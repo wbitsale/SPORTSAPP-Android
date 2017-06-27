@@ -1,0 +1,39 @@
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile 'no.nordicsemi.android.support.v18:scanner:1.0.0'
+    compile 'no.nordicsemi.android:log:2.1.0'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+
+    compile('org.simpleframework:simple-xml:2.7.1') {
+        exclude group: 'stax', module: 'stax-api'
+        exclude group: 'xpp3', module: 'xpp3'
+    }
+    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    // The DFU Library is imported automatically from jcenter.
+
+    compile 'com.google.code.gson:gson:2.5'
+
+    compile project(':common')
+
+}

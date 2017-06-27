@@ -113,9 +113,11 @@ public class ECGChart extends View {
         }
         init();
     }
-    public void setWindowSize(int size){
+
+    public void setWindowSize(int size) {
         this.mWindowSize = size;
     }
+
     private void init() {
         mRedrawPoints = ONEWINDOW / (1000 / mRedrawInterval);
         for (int i = 0; i < mWindowSize; i++)
@@ -179,7 +181,7 @@ public class ECGChart extends View {
 
         for (int i = 1; i < mWindowSize; i++) {
             int end = mDrawingBuf.get(i);
-            canvas.drawLine(i * mapRatio,  start / mGraphMax * height, (i + 1) * mapRatio, end / mGraphMax * height, mPaint);
+            canvas.drawLine(i * mapRatio, height - start / mGraphMax * height, (i + 1) * mapRatio, height - end / mGraphMax * height, mPaint);
             start = end;
         }
 

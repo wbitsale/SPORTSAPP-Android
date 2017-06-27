@@ -1,1 +1,1 @@
-include ':app', ':ecgchart', ':signature-pad-release', ':analysis-release', ':CircleProgressView'
+include ':app', ':ecgchart', ':signature-pad-release', ':analysis-release', ':CircleProgressView', ':otadfu', ':common'

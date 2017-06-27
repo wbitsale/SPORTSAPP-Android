@@ -24,8 +24,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.calm_health.sports.share.AppSharedPreferences;
@@ -34,10 +34,6 @@ import com.hero.ecgchart.ECGChart;
 
 import com.tool.sports.com.analysis.CalmAnalysisListener;
 import com.tool.sports.com.analysis.ProcessAnalysis;
-
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.UUID;
@@ -55,7 +51,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
-
+    private ImageView mImgConnect;
     private final static String HR_SERVICE_UUID = "00002a37-0000-1000-8000-00805f9b34fb";
     private final static UUID CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     private ECGChart mECGSweepChart;
@@ -80,7 +76,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         if (strMac != null) {
             initBLE();
             startScanBLE();
-        }else{
+        } else {
             Toast.makeText(this, "Device is not registered. ", Toast.LENGTH_SHORT).show();
         }
     }
@@ -174,6 +170,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
     }
 
     private void initGui() {
+        mImgConnect = (ImageView) findViewById(R.id.img_connect);
         this.mECGSweepChart = (ECGChart) findViewById(R.id.ecg_sweep_chart);
         mHrtChart = (SignaturePad) findViewById(R.id.hrt_chart);
 
@@ -181,13 +178,9 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         int MAX_LENGTH = 40;
         float[] arr = new float[MAX_LENGTH];
         for (int i = 0; i < MAX_LENGTH; i++)
-            arr[i] = (float) Math.random() * 200;
+            arr[i] = 100;
         mHrtChart.setGraphType(SignaturePad.PLOT_TYPE_HEART_RATE);
         mHrtChart.setPts(arr);
-
-        arr[0] = 200;
-        arr[1] = 20;
-
 
         mCircleMotion = (CircleProgressView) findViewById(R.id.circle_motin);
         mCircleCalm = (CircleProgressView) findViewById(R.id.circle_calm);
@@ -337,6 +330,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         int ecgVal;
         boolean isSensorDetected;
         isSensorDetected = isSensorDetected(characteristic.getValue()[0]);
+        setSensorDetectOnView(isSensorDetected);
         int hrsCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
         if (hrsCount == 0) return;
 //        Log.d(TAG, "" + hrsCount);
@@ -349,7 +343,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
 
             mECGSweepChart.addEcgData(ecgVal);    //mInputBuf.addLast(ecgVal);
             mCalmnessAnalysis.addEcgDataOne((double) ((ecgVal - 1200) / 800f));
-//            mCalmnessAnalysis.addEcgDataOne((double) ((ecgVal - 1200) / 800f));
+
             hrNumber++;
         }
         int batteryAmount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2);
@@ -360,6 +354,18 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
 
     private boolean isSensorDetected(final byte value) {
         return ((value & 0x01) != 0);
+    }
+
+    private void setSensorDetectOnView(final boolean _isSensorDetected) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (_isSensorDetected)
+                    mImgConnect.setImageResource(R.drawable.status_connected);
+                else
+                    mImgConnect.setImageResource(R.drawable.status_disconnected);
+            }
+        });
     }
 
     public boolean setCharacteristicNotification(BluetoothGattCharacteristic characteristic, boolean enable) {
@@ -411,17 +417,22 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
 
     }
 
-
     @Override
     public void on_calm_result(double v) {
-        Log.d(TAG, "clam: "+ v);
+        Log.d(TAG, "clam: " + v);
         mCircleCalm.setValue((float) v);
     }
 
     @Override
-    public void on_heart_rate_result(double v) {
-        mHrtChart.addPoint((float) v);
-        Log.d(TAG, "heartrate: "+ v);
-        mHrtChart.update();
+    public void on_heart_rate_result(final double v) {
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mHrtChart.addPoint((float) v);
+                Log.d(TAG, "heartrate: " + v);
+                mHrtChart.update();
+            }
+        });
     }
 }
