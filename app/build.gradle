@@ -30,4 +30,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':ecgchart')
     compile project(':signature-pad-release')
+    compile project(':analysis-release')
 }
