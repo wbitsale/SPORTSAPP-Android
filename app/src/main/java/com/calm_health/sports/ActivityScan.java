@@ -33,7 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.calm_health.sports.share.AppSharedPreferences;
-import com.tool.sports.com.dfutool.DfuActivity;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,10 +123,10 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
-        Intent intent = new Intent(ActivityScan.this, DfuActivity.class);
-
-        startActivity(intent);
-        finish();
+//        Intent intent = new Intent(ActivityScan.this, DfuActivity.class);
+//
+//        startActivity(intent);
+//        finish();
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

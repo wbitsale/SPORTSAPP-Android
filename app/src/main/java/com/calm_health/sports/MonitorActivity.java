@@ -27,14 +27,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-<<<<<<< HEAD
+
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-=======
+
 
 import android.widget.ImageView;
->>>>>>> ddbeb3010b2c1d69062c3108669f2476bd41200b
+
 import android.widget.Toast;
 
 import com.calm_health.sports.share.AppSharedPreferences;
