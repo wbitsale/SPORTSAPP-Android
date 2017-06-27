@@ -1,6 +1,7 @@
 package com.calm_health.sports;
 
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -13,9 +14,12 @@ import android.bluetooth.BluetoothProfile;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,8 +27,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.calm_health.sports.share.AppSharedPreferences;
 import com.github.gcacace.signaturepad.views.SignaturePad;
 import com.hero.ecgchart.ECGChart;
+import com.tool.sports.com.analysis.ProcessAnalysis;
 
 
 import java.util.List;
@@ -47,13 +53,113 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
     private ECGChart mECGSweepChart;
     private SignaturePad mHrtChart;
 
+    private ProcessAnalysis mCalmnessAnalysis;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monitor);
         initGui();
-        initBLE();
-        startScanBLE();
+
+
+        getDevice();
+        init_calmnessModule();
+        _checkPermission();
+    }
+
+    private void getDevice() {
+        String strMac = AppSharedPreferences.getMac(this);
+        if (strMac != null) {
+            initBLE();
+            startScanBLE();
+        }
+    }
+
+    private boolean _checkPermission() {
+        int nLog = ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.BLUETOOTH);
+        Log.d("permisiontest", "nLog: " + nLog);
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+            // When user pressed Deny and still wants to use this functionality, show the rationale
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH)) {
+                Log.d("permisiontest", "1 BLUETOOTH if");
+            } else {
+                Log.d("permisiontest", "1 BLUETOOTH else");
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.BLUETOOTH}, REQUEST_PERMISSION_REQ_CODE);
+            }
+        }
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+            // When user pressed Deny and still wants to use this functionality, show the rationale
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_ADMIN)) {
+                Log.d("permisiontest", "2 BLUETOOTH_ADMIN if");
+            } else {
+                Log.d("permisiontest", "2 BLUETOOTH_ADMIN else");
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.BLUETOOTH_ADMIN}, REQUEST_PERMISSION_REQ_CODE);
+            }
+        }
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // When user pressed Deny and still wants to use this functionality, show the rationale
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_REQ_CODE);
+            }
+
+        }
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // When user pressed Deny and still wants to use this functionality, show the rationale
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_REQ_CODE);
+            }
+        }
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+            // When user pressed Deny and still wants to use this functionality, show the rationale
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH)) {
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.BLUETOOTH}, REQUEST_PERMISSION_REQ_CODE);
+            }
+        }
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // When user pressed Deny and still wants to use this functionality, show the rationale
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                Log.d("permisiontest", "3 ACCESS_COARSE_LOCATION if");
+            } else {
+                Log.d("permisiontest", "3 ACCESS_COARSE_LOCATION else");
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_REQ_CODE);
+            }
+        }
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.NFC) != PackageManager.PERMISSION_GRANTED) {
+            // When user pressed Deny and still wants to use this functionality, show the rationale
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.NFC)) {
+                Log.d("permisiontest", "4 NFC if");
+            } else {
+                Log.d("permisiontest", "4 NFC else");
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.NFC}, REQUEST_PERMISSION_REQ_CODE);
+            }
+        }
+        return false;
+    }
+
+    private void init_calmnessModule() {
+        mCalmnessAnalysis = new ProcessAnalysis(); // create instance
+        mCalmnessAnalysis.startCalm(); // start Analysis Algorithm
     }
 
     private void initGui() {
@@ -217,6 +323,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
                 ecgVal = 1250;
 
             mECGSweepChart.addEcgData(ecgVal);    //mInputBuf.addLast(ecgVal);
+            mCalmnessAnalysis.addEcgDataOne((double) ((ecgVal - 1200) / 800f));
 //            mCalmnessAnalysis.addEcgDataOne((double) ((ecgVal - 1200) / 800f));
             hrNumber++;
         }
