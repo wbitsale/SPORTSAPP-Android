@@ -31,13 +31,15 @@
         <activity android:name=".MainActivity" />
         <activity
             android:name=".ActivityScan"
-            android:hardwareAccelerated="false" />
-        <activity android:name=".MonitorActivity">
+            android:hardwareAccelerated="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".MonitorActivity">
+
         </activity>
     </application>
 

@@ -26,7 +26,7 @@
                     android:layout_height="wrap_content"
                     android:text="Electrocardiograph"
                     android:layout_weight="5"
-                    android:textSize="18dip"
+                    android:textSize="18sp"
                     android:textColor="#333"
                     android:layout_alignParentLeft="true"/>
                 <TextView
@@ -34,7 +34,7 @@
                     android:layout_height="wrap_content"
                     android:text="Device Connect"
                     android:gravity="right"
-                    android:textSize="16dip"
+                    android:textSize="16sp"
                     android:textColor="#333"
                     android:layout_weight="4"/>
                 <LinearLayout
@@ -55,7 +55,7 @@
             android:layout_marginTop="5dip"
             android:id="@+id/ecg_sweep_chart"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="match_parent"
             android:background="#333333"
             custom:graphMode="0"
             custom:grid="false"
@@ -112,12 +112,80 @@
             android:layout_width="match_parent"
             android:layout_height="1dip"
             android:background="#333"></LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:text="Heart Rate"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <com.github.gcacace.signaturepad.views.SignaturePad
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="fill_parent"
+                android:id="@+id/hrt_chart" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="left"
+                android:weightSum="3">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dip"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_margin="5dip">
+                    <ImageView
+                        android:layout_width="20dip"
+                        android:layout_height="20dip"
+                        android:src="@drawable/icon_zone"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dip"
+                        android:text="HR Zone"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dip"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_margin="5dip">
+                    <ImageView
+                        android:layout_width="20dip"
+                        android:layout_height="20dip"
+                        android:src="@drawable/icon_variance"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dip"
+                        android:text="HR Variance"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dip"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_margin="5dip">
+                    <ImageView
+                        android:layout_width="20dip"
+                        android:layout_height="20dip"
+                        android:src="@drawable/icon_rythm"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dip"
+                        android:text="Beat Rythm"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
 
-        <com.github.gcacace.signaturepad.views.SignaturePad
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:background="#EEEEEE"
-            android:id="@+id/hrt_chart" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -125,10 +193,94 @@
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
+        xmlns:CircleProgressView="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:orientation="vertical"
-        android:layout_weight="3">
+        android:orientation="horizontal"
+        android:layout_weight="3"
+        android:weightSum="2"     >
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Motion Intensity"
+                android:gravity="center"/>
+            <at.grabner.circleprogress.CircleProgressView
+                android:id="@+id/circle_motin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="20dip"
+                CircleProgressView:cpv_autoTextSize="true"
+                CircleProgressView:cpv_barColor="@color/primary"
+                CircleProgressView:cpv_barWidth="10dp"
+                CircleProgressView:cpv_innerContourSize="0dp"
+                CircleProgressView:cpv_maxValue="100"
+                CircleProgressView:cpv_outerContourSize="0dp"
+                CircleProgressView:cpv_rimColor="@color/primary_light"
+                CircleProgressView:cpv_rimWidth="10dp"
+                CircleProgressView:cpv_seekMode="true"
+                CircleProgressView:cpv_showUnit="true"
+                CircleProgressView:cpv_spinColor="@color/primary"
+                CircleProgressView:cpv_textColor="@color/primary_dark"
+                CircleProgressView:cpv_textScale="1"
+                CircleProgressView:cpv_unit="G"
+                CircleProgressView:cpv_unitColor="@color/primary_light"
+                CircleProgressView:cpv_unitPosition="right_bottom"
+                CircleProgressView:cpv_unitScale="1"
+                CircleProgressView:cpv_value="10"
+                CircleProgressView:cpv_blockCount="30"
+                CircleProgressView:cpv_blockScale="0.8"/>
+            </FrameLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CALMness"
+                    android:gravity="center"/>
+                <at.grabner.circleprogress.CircleProgressView
+                    android:id="@+id/circle_calm"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="20dip"
+                    CircleProgressView:cpv_autoTextSize="true"
+                    CircleProgressView:cpv_barColor="@color/primary"
+                    CircleProgressView:cpv_barWidth="10dp"
+                    CircleProgressView:cpv_innerContourSize="0dp"
+                    CircleProgressView:cpv_maxValue="100"
+                    CircleProgressView:cpv_outerContourSize="0dp"
+                    CircleProgressView:cpv_rimColor="@color/primary_light"
+                    CircleProgressView:cpv_rimWidth="10dp"
+                    CircleProgressView:cpv_seekMode="true"
+                    CircleProgressView:cpv_showUnit="true"
+                    CircleProgressView:cpv_spinColor="@color/primary"
+                    CircleProgressView:cpv_textColor="@color/primary_dark"
+                    CircleProgressView:cpv_textScale="1"
+                    CircleProgressView:cpv_unit="%"
+                    CircleProgressView:cpv_unitColor="@color/primary_light"
+                    CircleProgressView:cpv_unitPosition="right_bottom"
+                    CircleProgressView:cpv_unitScale="1"
+                    CircleProgressView:cpv_value="10"
+                    CircleProgressView:cpv_blockCount="30"
+                    CircleProgressView:cpv_blockScale="0.8"/>
+            </FrameLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 

@@ -14,6 +14,7 @@ import android.bluetooth.BluetoothProfile;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -30,14 +31,21 @@ import android.widget.Toast;
 import com.calm_health.sports.share.AppSharedPreferences;
 import com.github.gcacace.signaturepad.views.SignaturePad;
 import com.hero.ecgchart.ECGChart;
+
+import com.tool.sports.com.analysis.CalmAnalysisListener;
 import com.tool.sports.com.analysis.ProcessAnalysis;
 
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.UUID;
 
+import at.grabner.circleprogress.CircleProgressView;
 
-public class MonitorActivity extends AppCompatActivity implements BluetoothAdapter.LeScanCallback {
+
+public class MonitorActivity extends AppCompatActivity implements BluetoothAdapter.LeScanCallback, CalmAnalysisListener {
     private final static String TAG = "monitoractivitylog";
     private static final int REQUEST_ENABLE_BT = 1;
     private final static int REQUEST_PERMISSION_REQ_CODE = 34; // any 8-bit number
@@ -52,6 +60,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
     private final static UUID CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     private ECGChart mECGSweepChart;
     private SignaturePad mHrtChart;
+    private CircleProgressView mCircleCalm, mCircleMotion;
 
     private ProcessAnalysis mCalmnessAnalysis;
 
@@ -60,7 +69,6 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_monitor);
         initGui();
-
 
         getDevice();
         init_calmnessModule();
@@ -72,6 +80,8 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         if (strMac != null) {
             initBLE();
             startScanBLE();
+        }else{
+            Toast.makeText(this, "Device is not registered. ", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -159,6 +169,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
 
     private void init_calmnessModule() {
         mCalmnessAnalysis = new ProcessAnalysis(); // create instance
+        mCalmnessAnalysis.setOnCalmnessCallback(this);
         mCalmnessAnalysis.startCalm(); // start Analysis Algorithm
     }
 
@@ -166,16 +177,31 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         this.mECGSweepChart = (ECGChart) findViewById(R.id.ecg_sweep_chart);
         mHrtChart = (SignaturePad) findViewById(R.id.hrt_chart);
 
-        int MAX_LENGTH = 220;
+
+        int MAX_LENGTH = 40;
         float[] arr = new float[MAX_LENGTH];
         for (int i = 0; i < MAX_LENGTH; i++)
             arr[i] = (float) Math.random() * 200;
         mHrtChart.setGraphType(SignaturePad.PLOT_TYPE_HEART_RATE);
         mHrtChart.setPts(arr);
+
+        arr[0] = 200;
+        arr[1] = 20;
+
+
+        mCircleMotion = (CircleProgressView) findViewById(R.id.circle_motin);
+        mCircleCalm = (CircleProgressView) findViewById(R.id.circle_calm);
+
+        mCircleMotion.setBarColor(Color.rgb(0xf9, 0xff, 0x00), Color.rgb(0x98, 0x0e, 0x00));
+        mCircleCalm.setBarColor(getColor(R.color.primary), Color.RED);
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+
+
                 mHrtChart.update();
+
             }
         }, 1000);
     }
@@ -223,7 +249,6 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
                     // We have been granted the Manifest.permission.ACCESS_COARSE_LOCATION permission. Now we may proceed with scanning.
                     startScanBLE();
                 } else {
-
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -314,7 +339,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         isSensorDetected = isSensorDetected(characteristic.getValue()[0]);
         int hrsCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
         if (hrsCount == 0) return;
-        Log.d(TAG, "" + hrsCount);
+//        Log.d(TAG, "" + hrsCount);
         int sum = 0;
         for (int i = 0; i < hrsCount; i++) {
             ecgVal = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + i * 2);
@@ -384,5 +409,19 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
 
         stopScanBLE();
 
+    }
+
+
+    @Override
+    public void on_calm_result(double v) {
+        Log.d(TAG, "clam: "+ v);
+        mCircleCalm.setValue((float) v);
+    }
+
+    @Override
+    public void on_heart_rate_result(double v) {
+        mHrtChart.addPoint((float) v);
+        Log.d(TAG, "heartrate: "+ v);
+        mHrtChart.update();
     }
 }
