@@ -33,6 +33,4 @@
     <style name="CalmTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="CalmTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-
 </resources>

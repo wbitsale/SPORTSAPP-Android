@@ -42,8 +42,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ListView;
@@ -51,6 +49,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.calm_health.sports.share.AppSharedPreferences;
 import com.tool.sports.com.dfutool.AppHelpFragment;
 import com.tool.sports.com.dfutool.DfuService;
 import com.tool.sports.com.dfutool.PermissionRationaleFragment;
@@ -84,13 +83,13 @@ import no.nordicsemi.android.support.v18.scanner.ScanResult;
 import no.nordicsemi.android.support.v18.scanner.ScanSettings;
 
 /**
- * DfuActivity is the main DFU activity It implements DFUManagerCallbacks to receive callbacks from DFUManager class It implements
+ * ActivityOtaDfu is the main DFU activity It implements DFUManagerCallbacks to receive callbacks from DFUManager class It implements
  * DeviceScannerFragment.OnDeviceSelectedListener callback to receive callback when device is selected from scanning dialog The activity supports portrait and
  * landscape orientations
  */
-public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, ScannerFragment.OnDeviceSelectedListener,
+public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks<Cursor>, ScannerFragment.OnDeviceSelectedListener,
         UploadCancelFragment.CancelFragmentListener, PermissionRationaleFragment.PermissionDialogListener {
-    private static final String TAG = "DfuActivity";
+    private static final String TAG = "ActivityOtaDfu";
 
     private static final String PREFS_DEVICE_NAME = "no.nordicsemi.android.nrftoolbox.dfu.PREFS_DEVICE_NAME";
     private static final String PREFS_FILE_NAME = "no.nordicsemi.android.nrftoolbox.dfu.PREFS_FILE_NAME";
@@ -122,7 +121,7 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
     private TextView mTextTitle;
     private ProgressBar mProgressBar;
 
-    private Button  mUploadButton;
+    private Button mUploadButton;
 
     private BluetoothDevice mSelectedDevice;
     private String mFilePath;
@@ -306,35 +305,24 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
         mPackage = new Package();
         downloadFirmware();
 
-        if (savedInstanceState == null) {
-            Bundle extras = getIntent().getExtras();
-            if (extras == null) {
-                mStrMacAddressFromJavascript = null;
-            } else {
-                mStrMacAddressFromJavascript = extras.getString("BLE_MAC_ADDRESS");
-            }
-        } else {
-            mStrMacAddressFromJavascript = (String) savedInstanceState.getSerializable("BLE_MAC_ADDRESS");
-        }
+        mStrMacAddress = AppSharedPreferences.getMac(this);
 
-        Log.d("startscan", "value: " + mStrMacAddressFromJavascript);
-        if (mStrMacAddressFromJavascript == null) {
-            mStrMacAddressFromJavascript = "C7:27:0C:D5:B2:B1";
+        Log.d("dfubledevice", "value: " + mStrMacAddress);
+        if (mStrMacAddress != null) {
+            // auto Find device after 1 second
+            new Handler().postDelayed(
+                    new Runnable() {
+                        @RequiresApi(api = Build.VERSION_CODES.M)
+                        public void run() {
+                            Log.i("tag", "This'll run 1000 milliseconds later");
+                            startScan();
+                        }
+                    },
+                    1000);
         }
-        Log.d("startscan", "test value: " + mStrMacAddressFromJavascript);
-        // auto Find device after 1 second
-        new Handler().postDelayed(
-                new Runnable() {
-                    @RequiresApi(api = Build.VERSION_CODES.M)
-                    public void run() {
-                        Log.i("tag", "This'll run 1000 milliseconds later");
-                        startScan();
-                    }
-                },
-                1000);
     }
 
-    String mStrMacAddressFromJavascript;
+    private String mStrMacAddress;
 
     private static String mStr_file_src = "http://13.113.160.171/firmware/download";
     private static String mStr_file_dest = Environment.getExternalStorageDirectory().toString() + "/firmware.zip";
@@ -456,7 +444,6 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
         }
 
     }//End DownloadFileFromURL
-
 
 
     @Override
@@ -654,7 +641,7 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
                 // and read new one
                 final Uri uri = data.getData();
             /*
-			 * The URI returned from application may be in 'file' or 'content' schema. 'File' schema allows us to create a File object and read details from if
+             * The URI returned from application may be in 'file' or 'content' schema. 'File' schema allows us to create a File object and read details from if
 			 * directly. Data from 'Content' schema must be read by Content Provider. To do that we are using a Loader.
 			 */
                 if (uri.getScheme().equals("file")) {
@@ -679,8 +666,8 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
         final Uri uri = args.getParcelable(EXTRA_URI);
-		/*
-		 * Some apps, f.e. Google Drive allow to select file that is not on the device. There is no "_data" column handled by that provider. Let's try to obtain
+        /*
+         * Some apps, f.e. Google Drive allow to select file that is not on the device. There is no "_data" column handled by that provider. Let's try to obtain
 		 * all columns and than check which columns are present.
 		 */
         // final String[] projection = new String[] { MediaStore.MediaColumns.DISPLAY_NAME, MediaStore.MediaColumns.SIZE, MediaStore.MediaColumns.DATA };
@@ -854,11 +841,13 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
             }).show();
         }
     }
+
     public void onCalcelClicked(final View view) {
 
     }
+
     /**
-     * Callback of UPDATE/CANCEL button on DfuActivity
+     * Callback of UPDATE/CANCEL button on ActivityOtaDfu
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onUploadClicked(final View view) {
@@ -930,7 +919,7 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
     }
 
     /**
-     * Callback of CONNECT/DISCONNECT button on DfuActivity
+     * Callback of CONNECT/DISCONNECT button on ActivityOtaDfu
      */
     public void onConnectClicked(final View view) {
         if (isBLEEnabled()) {
@@ -1120,8 +1109,8 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
             for (int i = 0; i < results.size(); i++) {
                 Log.d("startscan", results.get(i).getDevice().getAddress());
                 String strFoundMac = results.get(i).getDevice().getAddress();
-                if (mStrMacAddressFromJavascript != null) {
-                    if (mStrMacAddressFromJavascript.contentEquals(strFoundMac)) {
+                if (mStrMacAddress != null) {
+                    if (mStrMacAddress.contentEquals(strFoundMac)) {
                         Log.d("startscan", "Device selected");
                         onDeviceSelected(results.get(i).getDevice(), results.get(i).getDevice().getName());
 //                        mTextTitle.setText("" + results.get(i).getDevice().getName() + " Firmware Update");

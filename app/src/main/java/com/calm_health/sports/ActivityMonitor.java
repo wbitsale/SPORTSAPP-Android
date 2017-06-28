@@ -17,7 +17,6 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.net.LinkAddress;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -50,15 +49,13 @@ import com.hero.ecgchart.ECGChart;
 import com.tool.sports.com.analysis.CalmAnalysisListener;
 import com.tool.sports.com.analysis.ProcessAnalysis;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 import java.util.UUID;
 
 import at.grabner.circleprogress.CircleProgressView;
 
 
-public class MonitorActivity extends AppCompatActivity implements BluetoothAdapter.LeScanCallback, CalmAnalysisListener, NavigationView.OnNavigationItemSelectedListener {
+public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapter.LeScanCallback, CalmAnalysisListener, NavigationView.OnNavigationItemSelectedListener {
     private final static String TAG = "monitoractivitylog";
     private static final int REQUEST_ENABLE_BT = 1;
     private final static int REQUEST_PERMISSION_REQ_CODE = 34; // any 8-bit number
@@ -85,6 +82,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
 
     boolean isZoomed = false;
     boolean isRecord = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,11 +109,28 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
     private void getDevice() {
         String strMac = AppSharedPreferences.getMac(this);
         if (strMac != null) {
+            Log.d(TAG, "device: " + strMac);
             initBLE();
             startScanBLE();
         } else {
             Toast.makeText(this, "Device is not registered. ", Toast.LENGTH_SHORT).show();
         }
+    }
+
+
+    public void disconnect() {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            return;
+        }
+        mBluetoothGatt.close();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.i(TAG, "destroy");
+        disconnect();
+        super.onDestroy();
+
     }
 
     private boolean _checkPermission() {
@@ -208,19 +223,18 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
 
     @Override
     public void onBackPressed() {
-        if(isZoomed){
+        if (isZoomed) {
             isZoomed = false;
             getSupportActionBar().show();
-            lyt_frame.setPadding(0,(int) MonitorActivity.this.getResources().getDimension(R.dimen.maring_dp),0,0);
+            lyt_frame.setPadding(0, (int) ActivityMonitor.this.getResources().getDimension(R.dimen.maring_dp), 0, 0);
             lyt_status.setVisibility(View.VISIBLE);
             lyt_info.setVisibility(View.VISIBLE);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, 0, 4f);
-            params.setMargins(10,0,10,0);
+            params.setMargins(10, 0, 10, 0);
             lyt_graph.setLayoutParams(params);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-        else
+        } else
             super.onBackPressed();
     }
 
@@ -230,7 +244,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         lyt_info = (LinearLayout) findViewById(R.id.lyt_info);
         lyt_record = (LinearLayout) findViewById(R.id.lyt_record);
         lyt_zoom = (LinearLayout) findViewById(R.id.lyt_zoom);
-        img_record = (ImageView)  findViewById(R.id.img_record);
+        img_record = (ImageView) findViewById(R.id.img_record);
         tx_record = (TextView) findViewById(R.id.tx_record);
         lyt_frame = (FrameLayout) findViewById(R.id.lyt_frame);
 
@@ -243,11 +257,11 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
                 lyt_info.setVisibility(View.GONE);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, 0, 11f);
-                params.setMargins(0,0,0,0);
+                params.setMargins(0, 0, 0, 0);
                 lyt_graph.setLayoutParams(params);
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 getSupportActionBar().hide();
-                lyt_frame.setPadding(0,0,0,0);
+                lyt_frame.setPadding(0, 0, 0, 0);
             }
         });
 
@@ -255,12 +269,10 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
             @Override
             public void onClick(View view) {
                 isRecord = !isRecord;
-                if(isRecord) {
+                if (isRecord) {
                     img_record.setBackgroundResource(R.drawable.status_recording);
                     tx_record.setText("Recording...");
-                }
-                else
-                {
+                } else {
                     img_record.setBackgroundResource(R.drawable.status_record);
                     tx_record.setText("Record");
                 }
@@ -292,7 +304,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-               mHrtChart.update();
+                mHrtChart.update();
             }
         }, 1000);
     }
@@ -369,6 +381,7 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.i(TAG, "disconnected");
                 mECGSweepChart.setConnection(false);
+                startScanBLE(); //retry connect
             }
         }
 

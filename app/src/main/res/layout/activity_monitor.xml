@@ -94,8 +94,7 @@
                     android:background="#333333"
                     custom:graphMode="0"
                     custom:grid="false"
-                    custom:lineColor="#00ff00"
-                    custom:windowSize="1000" />
+                    custom:lineColor="#00ff00" />
             </LinearLayout>
         </LinearLayout>
 

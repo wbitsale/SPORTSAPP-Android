@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.Image;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
@@ -123,7 +122,7 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
-//        Intent intent = new Intent(ActivityScan.this, DfuActivity.class);
+//        Intent intent = new Intent(ActivityScan.this, ActivityOtaDfu.class);
 //
 //        startActivity(intent);
 //        finish();
@@ -157,7 +156,7 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
             public void onClick(View view) {
                 if (currentBle != null) {
                     AppSharedPreferences.setMac(ActivityScan.this, currentBle.device.getAddress());
-                    Intent intent = new Intent(ActivityScan.this, MonitorActivity.class);
+                    Intent intent = new Intent(ActivityScan.this, ActivityMonitor.class);
                     startActivity(intent);
                     finish();
                 } else {
@@ -169,8 +168,8 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(ActivityScan.this, MonitorActivity.class);
-                Intent intent = new Intent(ActivityScan.this, DfuActivity.class);
+//                Intent intent = new Intent(ActivityScan.this, ActivityMonitor.class);
+                Intent intent = new Intent(ActivityScan.this, ActivityOtaDfu.class);
 
                 startActivity(intent);
                 finish();
