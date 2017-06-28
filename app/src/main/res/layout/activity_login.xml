@@ -140,7 +140,7 @@
 
 
                 <EditText
-                    android:id="@+id/et_email"
+                    android:id="@+id/edt_email"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:paddingLeft="10dip"
@@ -156,7 +156,7 @@
                     android:textCursorDrawable="@drawable/blackpipe" />
 
                 <EditText
-                    android:id="@+id/et_password"
+                    android:id="@+id/edt_password"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:paddingLeft="10dip"

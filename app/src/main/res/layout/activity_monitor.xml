@@ -1,288 +1,345 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="10dip"
-    android:paddingRight="10dip"
-    android:paddingTop="5dip"
-    android:orientation="vertical"
-    android:weightSum="11"
-    tools:context="com.calm_health.sports.MonitorActivity">
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
+    <include
+        android:id="@+id/id_toolbar"
+        layout="@layout/app_bar_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="200dip"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:layout_marginTop="80dip"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer" />
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dip"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_weight="4">
+        android:paddingLeft="10dip"
+        android:paddingRight="10dip"
+        android:paddingTop="55dip"
+        android:weightSum="11">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="10"
-            android:gravity="center">
+            android:layout_height="0dip"
+            android:layout_weight="4"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
                 <TextView
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
-                    android:text="Electrocardiograph"
+                    android:layout_alignParentLeft="true"
                     android:layout_weight="5"
-                    android:textSize="18sp"
+                    android:text="Electrocardiograph"
                     android:textColor="#333"
-                    android:layout_alignParentLeft="true"/>
+                    android:textSize="18sp" />
+
                 <TextView
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
-                    android:text="Device Connect"
+                    android:layout_weight="4"
                     android:gravity="right"
-                    android:textSize="16sp"
+                    android:text="Device Connect"
                     android:textColor="#333"
-                    android:layout_weight="4"/>
+                    android:textSize="16sp" />
+
                 <LinearLayout
                     android:layout_width="0dip"
                     android:layout_height="16dip"
                     android:layout_weight="1"
                     android:gravity="right">
+
                     <ImageView
                         android:id="@+id/img_connect"
                         android:layout_width="16dp"
                         android:layout_height="match_parent"
-                        android:src="@drawable/status_disconnected"
                         android:layout_alignParentRight="true"
-                        />
-                </LinearLayout>•
+                        android:src="@drawable/status_disconnected" />
+                </LinearLayout>
+                •
+            </LinearLayout>
+
+            <com.hero.ecgchart.ECGChart
+                android:id="@+id/ecg_sweep_chart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dip"
+                android:background="#333333"
+                custom:graphMode="0"
+                custom:grid="false"
+                custom:lineColor="#00ff00"
+                custom:windowSize="1000" />
         </LinearLayout>
-        <com.hero.ecgchart.ECGChart
-            android:layout_marginTop="5dip"
-            android:id="@+id/ecg_sweep_chart"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#333333"
-            custom:graphMode="0"
-            custom:grid="false"
-            custom:lineColor="#00ff00"
-            custom:windowSize="1000" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:orientation="vertical"
-        android:layout_weight="4">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dip"
+            android:layout_height="0dip"
+            android:layout_weight="4"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dip"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right|center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dip"
+                        android:text="Record"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="25dip"
+                        android:layout_height="25dip"
+                        android:layout_marginRight="5dip"
+                        android:src="@drawable/status_record" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="left|center_vertical">
+
+                    <ImageView
+                        android:layout_width="25dip"
+                        android:layout_height="25dip"
+                        android:layout_marginLeft="5dip"
+                        android:src="@drawable/status_record" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dip"
+                        android:text="Zoom"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dip"
+                android:background="#333"></LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Heart Rate"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <com.github.gcacace.signaturepad.views.SignaturePad
+                    android:id="@+id/hrt_chart"
+                    android:layout_width="0dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="left"
+                    android:orientation="vertical"
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dip"
+                        android:layout_margin="5dip"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="20dip"
+                            android:layout_height="20dip"
+                            android:src="@drawable/icon_zone" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dip"
+                            android:text="HR Zone" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dip"
+                        android:layout_margin="5dip"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="20dip"
+                            android:layout_height="20dip"
+                            android:src="@drawable/icon_variance" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dip"
+                            android:text="HR Variance" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dip"
+                        android:layout_margin="5dip"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="20dip"
+                            android:layout_height="20dip"
+                            android:src="@drawable/icon_rythm" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dip"
+                            android:text="Beat Rythm" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout xmlns:CircleProgressView="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="3"
             android:orientation="horizontal"
             android:weightSum="2">
+
             <LinearLayout
                 android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="right|center_vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:layout_marginRight="10dip"
-                    android:text="Record"/>
-                <ImageView
-                    android:layout_width="25dip"
-                    android:layout_height="25dip"
-                    android:layout_marginRight="5dip"
-                    android:src="@drawable/status_record"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="left|center_vertical">
-                <ImageView
-                    android:layout_width="25dip"
-                    android:layout_height="25dip"
-                    android:layout_marginLeft="5dip"
-                    android:src="@drawable/status_record"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dip"
-                    android:textSize="16sp"
-                    android:text="Zoom"/>
-            </LinearLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dip"
-            android:background="#333"></LinearLayout>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="Heart Rate"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-            <com.github.gcacace.signaturepad.views.SignaturePad
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="fill_parent"
-                android:id="@+id/hrt_chart" />
-            <LinearLayout
-                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="left"
-                android:weightSum="3">
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dip"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_margin="5dip">
-                    <ImageView
-                        android:layout_width="20dip"
-                        android:layout_height="20dip"
-                        android:src="@drawable/icon_zone"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dip"
-                        android:text="HR Zone"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dip"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_margin="5dip">
-                    <ImageView
-                        android:layout_width="20dip"
-                        android:layout_height="20dip"
-                        android:src="@drawable/icon_variance"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dip"
-                        android:text="HR Variance"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dip"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_margin="5dip">
-                    <ImageView
-                        android:layout_width="20dip"
-                        android:layout_height="20dip"
-                        android:src="@drawable/icon_rythm"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dip"
-                        android:text="Beat Rythm"/>
-                </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
+                android:layout_weight="1"
+                android:gravity="center">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
-        xmlns:CircleProgressView="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:orientation="horizontal"
-        android:layout_weight="3"
-        android:weightSum="2"     >
-        <LinearLayout
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center">
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Motion Intensity"
-                android:gravity="center"/>
-            <at.grabner.circleprogress.CircleProgressView
-                android:id="@+id/circle_motin"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="20dip"
-                CircleProgressView:cpv_autoTextSize="true"
-                CircleProgressView:cpv_barColor="@color/primary"
-                CircleProgressView:cpv_barWidth="10dp"
-                CircleProgressView:cpv_innerContourSize="0dp"
-                CircleProgressView:cpv_maxValue="100"
-                CircleProgressView:cpv_outerContourSize="0dp"
-                CircleProgressView:cpv_rimColor="@color/primary_light"
-                CircleProgressView:cpv_rimWidth="10dp"
-                CircleProgressView:cpv_seekMode="true"
-                CircleProgressView:cpv_showUnit="true"
-                CircleProgressView:cpv_spinColor="@color/primary"
-                CircleProgressView:cpv_textColor="@color/primary_dark"
-                CircleProgressView:cpv_textScale="1"
-                CircleProgressView:cpv_unit="G"
-                CircleProgressView:cpv_unitColor="@color/primary_light"
-                CircleProgressView:cpv_unitPosition="right_bottom"
-                CircleProgressView:cpv_unitScale="1"
-                CircleProgressView:cpv_value="10"
-                CircleProgressView:cpv_blockCount="30"
-                CircleProgressView:cpv_blockScale="0.8"/>
-            </FrameLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center">
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="CALMness"
-                    android:gravity="center"/>
-                <at.grabner.circleprogress.CircleProgressView
-                    android:id="@+id/circle_calm"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="20dip"
-                    CircleProgressView:cpv_autoTextSize="true"
-                    CircleProgressView:cpv_barColor="@color/primary"
-                    CircleProgressView:cpv_barWidth="10dp"
-                    CircleProgressView:cpv_innerContourSize="0dp"
-                    CircleProgressView:cpv_maxValue="100"
-                    CircleProgressView:cpv_outerContourSize="0dp"
-                    CircleProgressView:cpv_rimColor="@color/primary_light"
-                    CircleProgressView:cpv_rimWidth="10dp"
-                    CircleProgressView:cpv_seekMode="true"
-                    CircleProgressView:cpv_showUnit="true"
-                    CircleProgressView:cpv_spinColor="@color/primary"
-                    CircleProgressView:cpv_textColor="@color/primary_dark"
-                    CircleProgressView:cpv_textScale="1"
-                    CircleProgressView:cpv_unit="%"
-                    CircleProgressView:cpv_unitColor="@color/primary_light"
-                    CircleProgressView:cpv_unitPosition="right_bottom"
-                    CircleProgressView:cpv_unitScale="1"
-                    CircleProgressView:cpv_value="10"
-                    CircleProgressView:cpv_blockCount="30"
-                    CircleProgressView:cpv_blockScale="0.8"/>
-            </FrameLayout>
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Motion Intensity" />
+
+                    <at.grabner.circleprogress.CircleProgressView
+                        android:id="@+id/circle_motin"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="20dip"
+                        CircleProgressView:cpv_autoTextSize="true"
+                        CircleProgressView:cpv_barColor="@color/primary"
+                        CircleProgressView:cpv_barWidth="10dp"
+                        CircleProgressView:cpv_blockCount="30"
+                        CircleProgressView:cpv_blockScale="0.8"
+                        CircleProgressView:cpv_innerContourSize="0dp"
+                        CircleProgressView:cpv_maxValue="100"
+                        CircleProgressView:cpv_outerContourSize="0dp"
+                        CircleProgressView:cpv_rimColor="@color/primary_light"
+                        CircleProgressView:cpv_rimWidth="10dp"
+                        CircleProgressView:cpv_seekMode="true"
+                        CircleProgressView:cpv_showUnit="true"
+                        CircleProgressView:cpv_spinColor="@color/primary"
+                        CircleProgressView:cpv_textColor="@color/primary_dark"
+                        CircleProgressView:cpv_textScale="1"
+                        CircleProgressView:cpv_unit="G"
+                        CircleProgressView:cpv_unitColor="@color/primary_light"
+                        CircleProgressView:cpv_unitPosition="right_bottom"
+                        CircleProgressView:cpv_unitScale="1"
+                        CircleProgressView:cpv_value="10" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="CALMness" />
+
+                    <at.grabner.circleprogress.CircleProgressView
+                        android:id="@+id/circle_calm"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="20dip"
+                        CircleProgressView:cpv_autoTextSize="true"
+                        CircleProgressView:cpv_barColor="@color/primary"
+                        CircleProgressView:cpv_barWidth="10dp"
+                        CircleProgressView:cpv_blockCount="30"
+                        CircleProgressView:cpv_blockScale="0.8"
+                        CircleProgressView:cpv_innerContourSize="0dp"
+                        CircleProgressView:cpv_maxValue="100"
+                        CircleProgressView:cpv_outerContourSize="0dp"
+                        CircleProgressView:cpv_rimColor="@color/primary_light"
+                        CircleProgressView:cpv_rimWidth="10dp"
+                        CircleProgressView:cpv_seekMode="true"
+                        CircleProgressView:cpv_showUnit="true"
+                        CircleProgressView:cpv_spinColor="@color/primary"
+                        CircleProgressView:cpv_textColor="@color/primary_dark"
+                        CircleProgressView:cpv_textScale="1"
+                        CircleProgressView:cpv_unit="%"
+                        CircleProgressView:cpv_unitColor="@color/primary_light"
+                        CircleProgressView:cpv_unitPosition="right_bottom"
+                        CircleProgressView:cpv_unitScale="1"
+                        CircleProgressView:cpv_value="10" />
+                </FrameLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
-
     </LinearLayout>
 
 
-
-</LinearLayout>
+</android.support.v4.widget.DrawerLayout>
