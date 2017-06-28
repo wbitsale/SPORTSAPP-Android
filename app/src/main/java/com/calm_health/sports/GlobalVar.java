@@ -7,6 +7,5 @@ import android.bluetooth.BluetoothGatt;
  */
 
 public class GlobalVar {
-    public static BluetoothGatt mBluetoothGatt = null;
-    public static int nBattery = 20;
+    public static int nBattery = 0;
 }
