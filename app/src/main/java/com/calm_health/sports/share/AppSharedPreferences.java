@@ -20,6 +20,9 @@ public class AppSharedPreferences {
     public static final String BLE_MAC = "ble_mac";
 
     public static final String BLE_NAME = "ble_name";
+
+    public static final String BATTERY_LEVEL = "battery_level";
+
     public AppSharedPreferences() {
         super();
     }
@@ -177,6 +180,25 @@ public class AppSharedPreferences {
         bbSettings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         editor = bbSettings.edit();
         editor.putString(BLE_NAME, _strDeviceName);
+        editor.commit();
+    }
+    public static int getBatteryLevel(Context context)
+    {
+        SharedPreferences bbSettings;
+
+        bbSettings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        int nBatteryLeve = 0;
+        nBatteryLeve =bbSettings.getInt(BATTERY_LEVEL, 0);
+        return nBatteryLeve;
+    }
+
+    public static void setBatteryLevel(Context context, int _batteryLevel)
+    {
+        SharedPreferences bbSettings;
+        SharedPreferences.Editor editor;
+        bbSettings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        editor = bbSettings.edit();
+        editor.putInt(BATTERY_LEVEL, _batteryLevel);
         editor.commit();
     }
 

@@ -487,7 +487,8 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
         lyt_battery = (LinearLayout) findViewById(R.id.lyt_battery);
         tx_battery = (TextView) findViewById(R.id.tx_battery);
-        tx_battery.setText(GlobalVar.nBattery + "%");
+        final int nBattery = AppSharedPreferences.getBatteryLevel(this);
+        tx_battery.setText(nBattery + "%");
         lyt_battery.post(new Runnable() {
 
             @Override
@@ -495,7 +496,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
                 int nWidth = lyt_battery.getWidth();
                 int nHeight = lyt_battery.getHeight();
 
-                int newWidth = nWidth * (100 - GlobalVar.nBattery) / 100;
+                int newWidth = nWidth * (100 - nBattery) / 100;
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         newWidth, nHeight);

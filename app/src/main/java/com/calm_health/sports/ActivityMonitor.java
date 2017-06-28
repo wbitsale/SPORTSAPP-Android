@@ -85,6 +85,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
     boolean isZoomed = false;
     boolean isRecord = false;
     boolean isUserDisconnet = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,15 +106,18 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         navigationView.getMenu().getItem(0).setChecked(true);
 
         initGui();
-        getDevice();
+//        getDevice();
         init_calmnessModule();
         _checkPermission();
     }
 
+    private String mStrDeviceMacAddress;
+
     private void getDevice() {
-        String strMac = AppSharedPreferences.getDeviceMacAddress(this);
-        if (strMac != null) {
-            Log.d(TAG, "device: " + strMac);
+        mStrDeviceMacAddress = AppSharedPreferences.getDeviceMacAddress(this);
+        Toast.makeText(this, mStrDeviceMacAddress, Toast.LENGTH_SHORT).show();
+        if (mStrDeviceMacAddress != "null") {
+            Log.d(TAG, "device: " + mStrDeviceMacAddress);
             initBLE();
             startScanBLE();
         } else {
@@ -130,17 +134,18 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         mBluetoothGatt.close();
         mBluetoothGatt = null;
     }
-
+private static int mBatteryLevel = 0;
     @Override
     protected void onPause() {
         disconnect();
         super.onPause();
+        AppSharedPreferences.setBatteryLevel(this,mBatteryLevel);
     }
 
     @Override
     protected void onResume() {
-        getDevice();
         isUserDisconnet = false;
+        getDevice();
         super.onResume();
     }
 
@@ -238,7 +243,6 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         mCalmnessAnalysis.setOnCalmnessCallback(this);
         mCalmnessAnalysis.startCalm(); // start Analysis Algorithm
     }
-
 
 
     boolean doubleBackToExitPressedOnce = false;
@@ -411,7 +415,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         }
     }
 
-        private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+    private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
@@ -422,7 +426,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.i(TAG, "disconnected");
                 mECGSweepChart.setConnection(false);
-                if(!isUserDisconnet)
+                if (!isUserDisconnet)
                     startScanBLE(); //retry connect
             }
         }
@@ -511,7 +515,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
             hrNumber++;
         }
         int batteryAmount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2);
-        GlobalVar.nBattery = calcBattery(batteryAmount);
+        mBatteryLevel= calcBattery(batteryAmount);
         int accX = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 2);
         int accY = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 4);
         int accZ = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 6);
@@ -582,7 +586,8 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
 //        Log.d(TAG, "" + device.getName());
         if (device != null && device.getName() != null) {
             if (device.getName().toLowerCase().contains("calm")) {
-                connectBle(device);
+                if (device.getAddress().contentEquals(mStrDeviceMacAddress))
+                    connectBle(device);
             }
         }
     }
@@ -617,9 +622,10 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
     }
 
     NavigationView navigationView;
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        Log.i("menu","menu");
+        Log.i("menu", "menu");
         int id = item.getItemId();
         if (id == R.id.nav_exercise) {
         } else if (id == R.id.nav_sleep) {

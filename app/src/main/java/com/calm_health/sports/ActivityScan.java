@@ -126,7 +126,7 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
 //
 //        startActivity(intent);
 //        finish();
-        
+
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -226,14 +226,14 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
             mBluetoothAdapter.cancelDiscovery();
         }
         rotateAnimator.cancel();
-//        if(mBluetoothAdapter() > 0)
-//            tx_status.setText("Please scan new devices.");
-//        else
-        tx_status.setText("No device found. Try again.");
+
+        if (mLeDeviceListAdapter.mLeDevices.size() == 0)
+            tx_status.setText("No device found. Try again.");
     }
 
     private void initBLE() {
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {       }
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+        }
 
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
