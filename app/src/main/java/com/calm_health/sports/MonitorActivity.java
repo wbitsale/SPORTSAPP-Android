@@ -13,8 +13,11 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.LinkAddress;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -32,8 +35,12 @@ import android.util.Log;
 import android.view.MenuItem;
 
 
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.calm_health.sports.share.AppSharedPreferences;
@@ -42,6 +49,8 @@ import com.hero.ecgchart.ECGChart;
 
 import com.tool.sports.com.analysis.CalmAnalysisListener;
 import com.tool.sports.com.analysis.ProcessAnalysis;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 import java.util.UUID;
@@ -68,6 +77,14 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
 
     private ProcessAnalysis mCalmnessAnalysis;
 
+    LinearLayout lyt_status, lyt_record, lyt_zoom;
+    LinearLayout lyt_info, lyt_graph;
+    FrameLayout lyt_frame;
+    ImageView img_record;
+    TextView tx_record;
+
+    boolean isZoomed = false;
+    boolean isRecord = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -189,7 +206,69 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
         mCalmnessAnalysis.startCalm(); // start Analysis Algorithm
     }
 
+    @Override
+    public void onBackPressed() {
+        if(isZoomed){
+            isZoomed = false;
+            getSupportActionBar().show();
+            lyt_frame.setPadding(0,(int) MonitorActivity.this.getResources().getDimension(R.dimen.maring_dp),0,0);
+            lyt_status.setVisibility(View.VISIBLE);
+            lyt_info.setVisibility(View.VISIBLE);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 0, 4f);
+            params.setMargins(10,0,10,0);
+            lyt_graph.setLayoutParams(params);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        else
+            super.onBackPressed();
+    }
+
     private void initGui() {
+        lyt_status = (LinearLayout) findViewById(R.id.lyt_status);
+        lyt_graph = (LinearLayout) findViewById(R.id.lyt_graph);
+        lyt_info = (LinearLayout) findViewById(R.id.lyt_info);
+        lyt_record = (LinearLayout) findViewById(R.id.lyt_record);
+        lyt_zoom = (LinearLayout) findViewById(R.id.lyt_zoom);
+        img_record = (ImageView)  findViewById(R.id.img_record);
+        tx_record = (TextView) findViewById(R.id.tx_record);
+        lyt_frame = (FrameLayout) findViewById(R.id.lyt_frame);
+
+        lyt_zoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                isZoomed = true;
+                lyt_status.setVisibility(View.GONE);
+                lyt_info.setVisibility(View.GONE);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, 0, 11f);
+                params.setMargins(0,0,0,0);
+                lyt_graph.setLayoutParams(params);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                getSupportActionBar().hide();
+                lyt_frame.setPadding(0,0,0,0);
+            }
+        });
+
+        lyt_record.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isRecord = !isRecord;
+                if(isRecord) {
+                    img_record.setBackgroundResource(R.drawable.status_recording);
+                    tx_record.setText("Recording...");
+                }
+                else
+                {
+                    img_record.setBackgroundResource(R.drawable.status_record);
+                    tx_record.setText("Record");
+                }
+
+
+            }
+        });
+
         mImgConnect = (ImageView) findViewById(R.id.img_connect);
         this.mECGSweepChart = (ECGChart) findViewById(R.id.ecg_sweep_chart);
         mHrtChart = (SignaturePad) findViewById(R.id.hrt_chart);
@@ -265,6 +344,17 @@ public class MonitorActivity extends AppCompatActivity implements BluetoothAdapt
                 }
                 break;
             }
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Checks the orientation of the screen for landscape and portrait and set portrait mode always
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
     }
 

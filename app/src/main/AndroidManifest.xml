@@ -50,6 +50,7 @@
         <activity
             android:name=".MonitorActivity"
             android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/CalmTheme.NoActionBar"
             android:label="Exercise Monitor">
 
