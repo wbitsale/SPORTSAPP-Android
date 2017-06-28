@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -55,7 +56,8 @@ import java.util.UUID;
 import at.grabner.circleprogress.CircleProgressView;
 
 
-public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapter.LeScanCallback, CalmAnalysisListener, NavigationView.OnNavigationItemSelectedListener {
+public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapter.LeScanCallback, CalmAnalysisListener,
+        NavigationView.OnNavigationItemSelectedListener {
     private final static String TAG = "monitoractivitylog";
     private static final int REQUEST_ENABLE_BT = 1;
     private final static int REQUEST_PERMISSION_REQ_CODE = 34; // any 8-bit number
@@ -63,7 +65,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
     private final Handler mHandler = new Handler();
     private boolean mIsScanning = false;
     private BluetoothAdapter mBluetoothAdapter = null;
-//    private BluetoothGatt mBluetoothGatt;
+    //    private BluetoothGatt mBluetoothGatt;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private ImageView mImgConnect;
     private final static String HR_SERVICE_UUID = "00002a37-0000-1000-8000-00805f9b34fb";
@@ -97,8 +99,10 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().getItem(0).setChecked(true);
 
         initGui();
         getDevice();
@@ -221,6 +225,11 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         mCalmnessAnalysis.startCalm(); // start Analysis Algorithm
     }
 
+
+
+    boolean doubleBackToExitPressedOnce = false;
+
+
     @Override
     public void onBackPressed() {
         if (isZoomed) {
@@ -234,8 +243,26 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
             params.setMargins(10, 0, 10, 0);
             lyt_graph.setLayoutParams(params);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else
-            super.onBackPressed();
+        } else {
+            if (doubleBackToExitPressedOnce) {
+                stopScanBLE();
+                disconnect();
+                super.onBackPressed();
+                return;
+            }
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    doubleBackToExitPressedOnce = false;
+                }
+            }, 2000);
+
+        }
+
     }
 
     private void initGui() {
@@ -474,7 +501,9 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         int accY = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 4);
         int accZ = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 6);
     }
+
     int nPercent = -1;
+
     public int calcBattery(int batteryAmount) {
         double fvolt = (double) batteryAmount / 4095 * 0.6 * 114 / 14;
         Log.i("battery1", "" + fvolt);
@@ -524,6 +553,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         return ok;
     }
 
+
     public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (mBluetoothAdapter == null || GlobalVar.mBluetoothGatt == null) {
             return;
@@ -571,8 +601,26 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         });
     }
 
+    NavigationView navigationView;
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
+        Log.i("menu","menu");
+        int id = item.getItemId();
+        if (id == R.id.nav_exercise) {
+        } else if (id == R.id.nav_sleep) {
+
+        } else if (id == R.id.nav_data) {
+
+        } else if (id == R.id.nav_profile) {
+
+        } else if (id == R.id.nav_setting) {
+            Intent intent = new Intent(ActivityMonitor.this, ActivityOtaDfu.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_exit) {
+
+        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawers();
+        return true;
     }
 }

@@ -159,7 +159,7 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
                     AppSharedPreferences.setDeviceName(ActivityScan.this, currentBle.device.getName());
 
                     Intent intent = new Intent(ActivityScan.this, ActivityMonitor.class);
-
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
                 } else {
@@ -171,9 +171,8 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(ActivityScan.this, ActivityMonitor.class);
-                Intent intent = new Intent(ActivityScan.this, ActivityOtaDfu.class);
-
+                Intent intent = new Intent(ActivityScan.this, ActivityMonitor.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
             }

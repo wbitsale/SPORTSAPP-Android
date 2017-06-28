@@ -9,21 +9,6 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-    <include
-        android:id="@+id/id_toolbar"
-        layout="@layout/app_bar_main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="200dip"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:layout_marginTop="0dip"
-        app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer" />
-
     <FrameLayout
         android:id="@+id/lyt_frame"
         android:layout_width="match_parent"
@@ -371,5 +356,19 @@
 
     </FrameLayout>
 
+    <include
+        android:id="@+id/id_toolbar"
+        layout="@layout/app_bar_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="200dip"
+        android:descendantFocusability="blocksDescendants"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:layout_marginTop="80dip"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer" />
 </android.support.v4.widget.DrawerLayout>
