@@ -87,7 +87,7 @@ public class ECGChart extends View {
 
             mPaint = new Paint();
             mPaint.setAntiAlias(true);
-            mPaint.setStrokeWidth(4f);
+            mPaint.setStrokeWidth(3f);
             mPaint.setColor(mLineColor);
 
             mPaintGrid = new Paint();
