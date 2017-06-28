@@ -44,6 +44,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -120,6 +122,9 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     private TextView mTextUploading;
     private TextView mTextTitle;
     private ProgressBar mProgressBar;
+    //================Battery================
+    private LinearLayout lyt_battery;
+    private TextView tx_battery;
 
     private Button mUploadButton;
 
@@ -259,7 +264,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(com.tool.sports.com.dfutool.R.layout.activity_feature_dfu);
+        setContentView(R.layout.activity_feature_dfu);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -305,7 +310,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         mPackage = new Package();
         downloadFirmware();
 
-        mStrMacAddress = AppSharedPreferences.getMac(this);
+        mStrMacAddress = AppSharedPreferences.getDeviceMacAddress(this);
 
         Log.d("dfubledevice", "value: " + mStrMacAddress);
         if (mStrMacAddress != null) {
@@ -319,6 +324,8 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
                         }
                     },
                     1000);
+        } else {
+            Toast.makeText(this, "Device is not registered .", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -468,10 +475,34 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     }
 
     private void setGUI() {
-//        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-//        mTextTitle = (TextView) findViewById(R.id.textview_title);
+
+        TextView tv_devicename = (TextView) findViewById(R.id.device_name);
+        TextView tv_devicemac = (TextView) findViewById(R.id.tf_deviceMac);
+        String deviceName = AppSharedPreferences.getDeviceName(this);
+        String deviceMac = AppSharedPreferences.getDeviceMacAddress(this);
+        deviceName = (deviceName != "null") ? deviceName : "Unknown";
+        deviceMac = (deviceMac != "null") ? deviceMac : "Unknown";
+        tv_devicename.setText(deviceName);
+        tv_devicemac.setText(deviceMac);
+
+        lyt_battery = (LinearLayout) findViewById(R.id.lyt_battery);
+        tx_battery = (TextView) findViewById(R.id.tx_battery);
+        tx_battery.setText(GlobalVar.nBattery + "%");
+        lyt_battery.post(new Runnable() {
+
+            @Override
+            public void run() {
+                int nWidth = lyt_battery.getWidth();
+                int nHeight = lyt_battery.getHeight();
+
+                int newWidth = nWidth * (100 - GlobalVar.nBattery) / 100;
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        newWidth, nHeight);
+                lyt_battery.setLayoutParams(params);
+            }
+        });
+
 
         mDeviceNameView = (TextView) findViewById(com.tool.sports.com.dfutool.R.id.device_name);
         mFileNameView = (TextView) findViewById(com.tool.sports.com.dfutool.R.id.file_name);
@@ -685,8 +716,8 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     @Override
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor data) {
         if (data != null && data.moveToNext()) {
-			/*
-			 * Here we have to check the column indexes by name as we have requested for all. The order may be different.
+            /*
+             * Here we have to check the column indexes by name as we have requested for all. The order may be different.
 			 */
             final String fileName = data.getString(data.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME)/* 0 DISPLAY_NAME */);
             final int fileSize = data.getInt(data.getColumnIndex(MediaStore.MediaColumns.SIZE) /* 1 SIZE */);
@@ -1090,6 +1121,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 //                mTextPercentage.setEnabled(true);
             } else {
 //                mTextTitle.setText("Cannot found device");
+                Toast.makeText(this,"Cannot found device",Toast.LENGTH_SHORT).show();
                 mUploadButton.setEnabled(true);
                 mUploadButton.setText("Retry");
             }
@@ -1111,6 +1143,9 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
                 String strFoundMac = results.get(i).getDevice().getAddress();
                 if (mStrMacAddress != null) {
                     if (mStrMacAddress.contentEquals(strFoundMac)) {
+                        //khs
+                        ImageView imgConnec = (ImageView) findViewById(R.id.img_ble_connect);
+                        imgConnec.setImageResource(R.drawable.status_connected);
                         Log.d("startscan", "Device selected");
                         onDeviceSelected(results.get(i).getDevice(), results.get(i).getDevice().getName());
 //                        mTextTitle.setText("" + results.get(i).getDevice().getName() + " Firmware Update");

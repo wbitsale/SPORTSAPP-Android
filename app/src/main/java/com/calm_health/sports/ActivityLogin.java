@@ -20,40 +20,36 @@ public class ActivityLogin extends AppCompatActivity {
         initView();
     }
 
-    public void initView(){
-        btn_login = (Button) findViewById(R.id.btn_login);
+    public void initView() {
+        btn_login = (Button) findViewById(R.id.btn_next);
         lyt_facebook = (LinearLayout) findViewById(R.id.btn_sign_in_fb);
         lyt_google = (LinearLayout) findViewById(R.id.btn_sign_in_google);
         et_email = (EditText) findViewById(R.id.edt_email);
         et_pass = (EditText) findViewById(R.id.edt_password);
-//        btn_login.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String strEmail = et_email.getText().toString();
-//                String strPass = et_pass.getText().toString();
-//                if(strEmail.length() > 0 && strEmail.length() > 0) {
-//                    if (!strEmail.contains("@")) {
-//                        Toast.makeText(ActivityLogin.this, "Wrong Email Type.", Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
-//                    else if(!(strPass.length() > 5))
-//                    {
-//                        Toast.makeText(ActivityLogin.this, "Wrong Password.", Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
-//                    else{
-//                        auth(strEmail, strPass);
-//                    }
-//                }
-//                else{
-//                    Toast.makeText(ActivityLogin.this, "Please Fill the Gaps.", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
+        btn_login.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String strEmail = et_email.getText().toString();
+                String strPass = et_pass.getText().toString();
+                if (strEmail.length() > 0 && strEmail.length() > 0) {
+                    if (!strEmail.contains("@")) {
+                        Toast.makeText(ActivityLogin.this, "Wrong Email Type.", Toast.LENGTH_SHORT).show();
+                        return;
+                    } else if (!(strPass.length() > 5)) {
+                        Toast.makeText(ActivityLogin.this, "Wrong Password.", Toast.LENGTH_SHORT).show();
+                        return;
+                    } else {
+                        auth(strEmail, strPass);
+                    }
+                } else {
+                    Toast.makeText(ActivityLogin.this, "Please Fill the Gaps.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
-    public void auth(String strEmail, String strPass)
-    {
+    public void auth(String strEmail, String strPass) {
 
     }
 }

@@ -155,8 +155,11 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View view) {
                 if (currentBle != null) {
-                    AppSharedPreferences.setMac(ActivityScan.this, currentBle.device.getAddress());
+                    AppSharedPreferences.setDeviceMacAddress(ActivityScan.this, currentBle.device.getAddress());
+                    AppSharedPreferences.setDeviceName(ActivityScan.this, currentBle.device.getName());
+
                     Intent intent = new Intent(ActivityScan.this, ActivityMonitor.class);
+
                     startActivity(intent);
                     finish();
                 } else {

@@ -19,7 +19,7 @@ public class AppSharedPreferences {
 
     public static final String BLE_MAC = "ble_mac";
 
-
+    public static final String BLE_NAME = "ble_name";
     public AppSharedPreferences() {
         super();
     }
@@ -139,7 +139,7 @@ public class AppSharedPreferences {
     }
 
 
-    public static String getMac(Context context)
+    public static String getDeviceMacAddress(Context context)
     {
         SharedPreferences bbSettings;
         SharedPreferences.Editor editor;
@@ -149,7 +149,7 @@ public class AppSharedPreferences {
         return strMac;
     }
 
-    public static void setMac(Context context, String strMac)
+    public static void setDeviceMacAddress(Context context, String strMac)
     {
         SharedPreferences bbSettings;
         SharedPreferences.Editor editor;
@@ -159,5 +159,25 @@ public class AppSharedPreferences {
         editor.commit();
     }
 
+
+    public static String getDeviceName(Context context)
+    {
+        SharedPreferences bbSettings;
+        SharedPreferences.Editor editor;
+        bbSettings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String strMac = null;
+        strMac = String.valueOf(bbSettings.getString(BLE_NAME, null));
+        return strMac;
+    }
+
+    public static void setDeviceName(Context context, String _strDeviceName)
+    {
+        SharedPreferences bbSettings;
+        SharedPreferences.Editor editor;
+        bbSettings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        editor = bbSettings.edit();
+        editor.putString(BLE_NAME, _strDeviceName);
+        editor.commit();
+    }
 
 }

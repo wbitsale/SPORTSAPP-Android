@@ -63,7 +63,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
     private final Handler mHandler = new Handler();
     private boolean mIsScanning = false;
     private BluetoothAdapter mBluetoothAdapter = null;
-    private BluetoothGatt mBluetoothGatt;
+//    private BluetoothGatt mBluetoothGatt;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private ImageView mImgConnect;
     private final static String HR_SERVICE_UUID = "00002a37-0000-1000-8000-00805f9b34fb";
@@ -107,7 +107,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
     }
 
     private void getDevice() {
-        String strMac = AppSharedPreferences.getMac(this);
+        String strMac = AppSharedPreferences.getDeviceMacAddress(this);
         if (strMac != null) {
             Log.d(TAG, "device: " + strMac);
             initBLE();
@@ -119,10 +119,10 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
 
 
     public void disconnect() {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+        if (mBluetoothAdapter == null || GlobalVar.mBluetoothGatt == null) {
             return;
         }
-        mBluetoothGatt.close();
+        GlobalVar.mBluetoothGatt.close();
     }
 
     @Override
@@ -376,7 +376,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 Log.i(TAG, "connected");
                 mECGSweepChart.setConnection(true);
-                mBluetoothGatt.discoverServices();
+                GlobalVar.mBluetoothGatt.discoverServices();
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.i(TAG, "disconnected");
@@ -469,9 +469,22 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
             hrNumber++;
         }
         int batteryAmount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2);
+        GlobalVar.nBattery = calcBattery(batteryAmount);
         int accX = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 2);
         int accY = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 4);
         int accZ = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 6);
+    }
+    int nPercent = -1;
+    public int calcBattery(int batteryAmount) {
+        double fvolt = (double) batteryAmount / 4095 * 0.6 * 114 / 14;
+        Log.i("battery1", "" + fvolt);
+        int fpercent = (int) ((fvolt - 3.6) / (0.6) * 100);
+        if (fpercent <= 100 && fpercent >= 0) {
+            if (nPercent != -1)
+                fpercent = (fpercent + nPercent) / 2;
+            nPercent = fpercent;
+        }
+        return nPercent;
     }
 
     private boolean isSensorDetected(final byte value) {
@@ -491,11 +504,11 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
     }
 
     public boolean setCharacteristicNotification(BluetoothGattCharacteristic characteristic, boolean enable) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+        if (mBluetoothAdapter == null || GlobalVar.mBluetoothGatt == null) {
             return false;
         }
         boolean ok = false;
-        if (mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
+        if (GlobalVar.mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
             BluetoothGattDescriptor clientConfig = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
             if (clientConfig != null) {
                 if (enable) {
@@ -504,7 +517,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
                     ok = clientConfig.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
                 }
                 if (ok) {
-                    ok = mBluetoothGatt.writeDescriptor(clientConfig);
+                    ok = GlobalVar.mBluetoothGatt.writeDescriptor(clientConfig);
                 }
             }
         }
@@ -512,10 +525,10 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
     }
 
     public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+        if (mBluetoothAdapter == null || GlobalVar.mBluetoothGatt == null) {
             return;
         }
-        mBluetoothGatt.readCharacteristic(characteristic);
+        GlobalVar.mBluetoothGatt.readCharacteristic(characteristic);
     }
 
     @Override
@@ -532,7 +545,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
     public void connectBle(BluetoothDevice device) {
 
         if (device != null) {
-            mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
+            GlobalVar.mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
         }
 
         stopScanBLE();
