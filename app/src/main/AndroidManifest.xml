@@ -27,9 +27,9 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ActivityScan"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
 
-            </activity>
+        </activity>
 
         <activity
             android:name=".ActivityLogin"
@@ -44,24 +44,27 @@
             android:name=".ActivitySplash"
             android:screenOrientation="portrait"
             android:theme="@style/CalmTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
         <activity
             android:name=".ActivityMonitor"
-            android:screenOrientation="portrait"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/CalmTheme.NoActionBar"
-            android:label="Exercise Monitor">
+            android:label="Exercise Monitor"
+            android:screenOrientation="portrait"
+            android:theme="@style/CalmTheme.NoActionBar">
 
         </activity>
         <activity
             android:name=".ActivityOtaDfu"
             android:hardwareAccelerated="false"
             android:label="Firmware Update"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".ActivitySetting"
             android:screenOrientation="portrait" />

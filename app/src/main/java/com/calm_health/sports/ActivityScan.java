@@ -214,6 +214,7 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
         }
         if (mBluetoothAdapter.isEnabled()) {
             mBluetoothAdapter.startLeScan(this);
+            img_rotate.setVisibility(View.VISIBLE);
         } else {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -226,9 +227,12 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
             mBluetoothAdapter.cancelDiscovery();
         }
         rotateAnimator.cancel();
-
+        img_rotate.setVisibility(View.INVISIBLE);
         if (mLeDeviceListAdapter.mLeDevices.size() == 0)
             tx_status.setText("No device found. Try again.");
+        else{
+            tx_status.setText("");
+        }
     }
 
     private void initBLE() {

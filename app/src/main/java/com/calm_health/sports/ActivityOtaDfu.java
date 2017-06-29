@@ -308,7 +308,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         DfuServiceListenerHelper.registerProgressListener(this, mDfuProgressListener);
 
         mPackage = new Package();
-        downloadFirmware();
+
 
         mStrMacAddress = AppSharedPreferences.getDeviceMacAddress(this);
 
@@ -883,6 +883,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onUploadClicked(final View view) {
+        downloadFirmware();
         if (!mIsFound) {
             startScan();
             return;
@@ -992,6 +993,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         clearUI(false);// clear ui without device connect
         mTextPercentage.setText("Done");
         showToast(com.tool.sports.com.dfutool.R.string.dfu_success);
+        Toast.makeText(this,"Firmware has been updated successfully",Toast.LENGTH_LONG ).show();
     }
 
     public void onUploadCanceled() {

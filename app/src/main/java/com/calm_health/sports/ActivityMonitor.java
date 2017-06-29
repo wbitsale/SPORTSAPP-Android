@@ -117,7 +117,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         mStrDeviceMacAddress = AppSharedPreferences.getDeviceMacAddress(this);
         Toast.makeText(this, mStrDeviceMacAddress, Toast.LENGTH_SHORT).show();
         if (mStrDeviceMacAddress != "null") {
-            Log.d(TAG, "device: " + mStrDeviceMacAddress);
+            Log.d(TAG, "getDevice: " + mStrDeviceMacAddress);
             initBLE();
             startScanBLE();
         } else {
@@ -125,25 +125,35 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         }
     }
 
-
     public void disconnect() {
+        Log.d(TAG, "disconnect function");
         isUserDisconnet = true;
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.d(TAG, "disconnect function: mBluetoothGatt is null");
             return;
         }
+
+        Log.d(TAG, "disconnect function: mBluetoothGatt.disconnect()");
+        mBluetoothGatt.disconnect();
+        Log.d(TAG, "disconnect function: mBluetoothGatt.close()");
         mBluetoothGatt.close();
+        Log.d(TAG, "disconnect function: mBluetoothGatt = null");
         mBluetoothGatt = null;
     }
-private static int mBatteryLevel = 0;
+
+    private static int mBatteryLevel = 0;
+
     @Override
     protected void onPause() {
+        Log.d(TAG, "onPause");
         disconnect();
         super.onPause();
-        AppSharedPreferences.setBatteryLevel(this,mBatteryLevel);
+        AppSharedPreferences.setBatteryLevel(this, mBatteryLevel);
     }
 
     @Override
     protected void onResume() {
+        Log.i(TAG, "onResume");
         isUserDisconnet = false;
         getDevice();
         super.onResume();
@@ -151,7 +161,7 @@ private static int mBatteryLevel = 0;
 
     @Override
     protected void onDestroy() {
-        Log.i(TAG, "destroy");
+        Log.i(TAG, "onDestroy");
         disconnect();
         super.onDestroy();
     }
@@ -244,9 +254,7 @@ private static int mBatteryLevel = 0;
         mCalmnessAnalysis.startCalm(); // start Analysis Algorithm
     }
 
-
     boolean doubleBackToExitPressedOnce = false;
-
 
     @Override
     public void onBackPressed() {
@@ -278,9 +286,7 @@ private static int mBatteryLevel = 0;
                     doubleBackToExitPressedOnce = false;
                 }
             }, 2000);
-
         }
-
     }
 
     private void initGui() {
@@ -314,15 +320,15 @@ private static int mBatteryLevel = 0;
             @Override
             public void onClick(View view) {
                 isRecord = !isRecord;
-                if (isRecord) {
-                    img_record.setBackgroundResource(R.drawable.status_recording);
-                    tx_record.setText("Recording...");
-                } else {
-                    img_record.setBackgroundResource(R.drawable.status_record);
-                    tx_record.setText("Record");
-                }
-
-
+                Toast.makeText(ActivityMonitor.this, "Test Mode ( Record btn event )", Toast.LENGTH_SHORT).show();
+                disconnect();
+//                if (isRecord) {
+//                    img_record.setBackgroundResource(R.drawable.status_recording);
+//                    tx_record.setText("Recording...");
+//                } else {
+//                    img_record.setBackgroundResource(R.drawable.status_record);
+//                    tx_record.setText("Record");
+//                }
             }
         });
 
@@ -342,10 +348,7 @@ private static int mBatteryLevel = 0;
         mCircleCalm = (CircleProgressView) findViewById(R.id.circle_calm);
 
         mCircleMotion.setBarColor(Color.rgb(0xf9, 0xff, 0x00), Color.rgb(0x98, 0x0e, 0x00));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mCircleCalm.setBarColor(getColor(R.color.primary), Color.RED);
-        }
-
+        mCircleCalm.setBarColor(Color.rgb(0xf9, 0xff, 0x00), Color.rgb(0x98, 0x0e, 0x00));
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -419,12 +422,12 @@ private static int mBatteryLevel = 0;
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "connected");
+                Log.i(TAG, "onConnectionStateChange: STATE_CONNECTED");
                 mECGSweepChart.setConnection(true);
                 mBluetoothGatt.discoverServices();
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i(TAG, "disconnected");
+                Log.i(TAG, "onConnectionStateChange: STATE_DISCONNECTED");
                 mECGSweepChart.setConnection(false);
                 if (!isUserDisconnet)
                     startScanBLE(); //retry connect
@@ -434,7 +437,7 @@ private static int mBatteryLevel = 0;
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "discorverd");
+                Log.i(TAG, "onServicesDiscovered");
                 List<BluetoothGattService> services = gatt.getServices();
                 setCharacteristic(services, HR_SERVICE_UUID);
             }
@@ -515,7 +518,7 @@ private static int mBatteryLevel = 0;
             hrNumber++;
         }
         int batteryAmount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2);
-        mBatteryLevel= calcBattery(batteryAmount);
+        mBatteryLevel = calcBattery(batteryAmount);
         int accX = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 2);
         int accY = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 4);
         int accZ = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 6);
@@ -593,7 +596,7 @@ private static int mBatteryLevel = 0;
     }
 
     public void connectBle(BluetoothDevice device) {
-
+        Log.d(TAG, "connectBle");
         if (device != null) {
             mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
         }

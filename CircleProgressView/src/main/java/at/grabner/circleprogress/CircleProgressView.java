@@ -172,7 +172,7 @@ public class CircleProgressView extends View {
     private float mRelativeUniteSize = 1f;
     private boolean mSeekModeEnabled = false;
     private boolean mShowTextWhileSpinning = false;
-    private boolean mShowBlock = true;
+    private boolean mShowBlock = false;
     private int mBlockCount = 18;
     private float mBlockScale = 0.9f;
     private float mBlockDegree = 360 / mBlockCount;
