@@ -12,7 +12,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -37,10 +36,13 @@ public class ECGChart extends View {
     private int mWindowSize;
     private int mWindowCount = 2;
     private int ONEWINDOW = 240;
-    private LinkedBlockingDeque<Integer> mInputBuf;
-    private Vector<Integer> mDrawingBuf;
+    private LinkedBlockingDeque<PointData> mInputBuf;
+    private Vector<PointData> mDrawingBuf;
 
     private Paint mPaint;
+    private Paint mAFPaint;
+    private Paint mNormalPaint;
+
 
     private Paint mPaintGrid;
     private Paint mPaintRuler;
@@ -90,6 +92,16 @@ public class ECGChart extends View {
             mPaint.setStrokeWidth(3f);
             mPaint.setColor(mLineColor);
 
+            mAFPaint = new Paint();
+            mAFPaint.setAntiAlias(true);
+            mAFPaint.setStrokeWidth(5f);
+            mAFPaint.setColor(Color.rgb(255, 255, 255));
+
+            mNormalPaint = new Paint();
+            mNormalPaint.setAntiAlias(true);
+            mNormalPaint.setStrokeWidth(5f);
+            mNormalPaint.setColor(Color.rgb(255, 255, 255));
+
             mPaintGrid = new Paint();
             mPaintGrid.setColor(mGridColor);
             mPaintGrid.setStrokeWidth(2f);
@@ -121,7 +133,7 @@ public class ECGChart extends View {
     private void init() {
         mRedrawPoints = ONEWINDOW / (1000 / mRedrawInterval);
         for (int i = 0; i < mWindowSize; i++)
-            mDrawingBuf.add(1250);
+            mDrawingBuf.add(new PointData(1250));
 
         TimerTask drawEmitter = new TimerTask() {
             @Override
@@ -141,14 +153,14 @@ public class ECGChart extends View {
                         }
                         if (mGraphMode == SWEEP_MODE) {
                             for (int i = 0; i < mRedrawPoints; i++) {
-                                int val = mInputBuf.pollFirst();
+                                PointData val = mInputBuf.pollFirst();
                                 mDrawingBuf.remove(mDrawPosition);
                                 mDrawingBuf.add(mDrawPosition++, val);
                                 if (mDrawPosition >= mWindowSize) mDrawPosition = 0;
                             }
                         } else {
                             for (int i = 0; i < mRedrawPoints; i++) {
-                                int val = mInputBuf.pollFirst();
+                                PointData val = mInputBuf.pollFirst();
                                 mDrawingBuf.remove(0);
                                 mDrawingBuf.add(val);
                             }
@@ -177,11 +189,20 @@ public class ECGChart extends View {
             return;
 
         float mapRatio = width / mWindowSize;
-        int start = mDrawingBuf.get(0);
+        PointData start = mDrawingBuf.get(0);
 
         for (int i = 1; i < mWindowSize; i++) {
-            int end = mDrawingBuf.get(i);
-            canvas.drawLine(i * mapRatio, height - start / mGraphMax * height, (i + 1) * mapRatio, height - end / mGraphMax * height, mPaint);
+            PointData end = mDrawingBuf.get(i);
+            canvas.drawLine(i * mapRatio, height - start.value / mGraphMax * height, (i + 1) * mapRatio, height - end.value / mGraphMax * height, mPaint);
+            if (start.info == 1) {// if af then
+                canvas.drawText("AF", i * mapRatio - 10, height - start.value / mGraphMax * height - 10, mAFPaint);
+                canvas.drawPoint(i * mapRatio, height - start.value / mGraphMax * height, mAFPaint);
+            }
+            if (start.info == 0) {// if normal then
+                canvas.drawText("N", i * mapRatio - 5, height - start.value / mGraphMax * height - 10, mNormalPaint);
+                canvas.drawPoint(i * mapRatio, height - start.value / mGraphMax * height, mNormalPaint);
+            }
+
             start = end;
         }
 
@@ -266,16 +287,19 @@ public class ECGChart extends View {
     }
 
     public void addEcgData(int data) {
-
-        mInputBuf.addLast(data);
+        mInputBuf.addLast(new PointData(data));
         Log.i("addEcgData", "" + mInputBuf.size());
+    }
+
+    public void addEcgData(PointData data) {
+        mInputBuf.addLast(data);
     }
 
     public void addEcgDataArr(int[] data) {
         Log.i("addEcgDataArr", "" + data.length + " : " + mInputBuf.size());
         checkBufOverflow();
         for (int aData : data) {
-            mInputBuf.addLast(aData);
+            mInputBuf.addLast(new PointData(aData));
         }
     }
 
@@ -284,7 +308,7 @@ public class ECGChart extends View {
         checkBufOverflow();
         for (int i = 0; i < data.size(); i++) {
             try {
-                mInputBuf.addLast(data.takeFirst());
+                mInputBuf.addLast(new PointData(data.takeFirst()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

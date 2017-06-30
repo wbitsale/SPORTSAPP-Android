@@ -28,6 +28,10 @@ dependencies {
     compile project(':signature-pad-release')
     compile project(':analysis-release')
     compile project(':CircleProgressView')
+<<<<<<< HEAD
+=======
+    compile 'no.nordicsemi.android.support.v18:scanner:1.0.0'
+>>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
     compile project(':otadfu')
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.kevalpatel2106:ringtonepicker:1.0'

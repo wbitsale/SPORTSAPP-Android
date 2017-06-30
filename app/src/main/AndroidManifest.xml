@@ -21,12 +21,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/CalmTheme">
+
+        <activity
+            android:name=".ECGActivity"
+            android:icon="@drawable/ic_hrs_feature"
+            android:label="@string/hrs_feature_title"
+            android:keepScreenOn="true"
+            android:screenOrientation="landscape">
+
+        </activity>
         <activity
             android:name=".ActivityLoginScreen"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ActivityScan"
+<<<<<<< HEAD
             android:screenOrientation="portrait" />
+=======
+            android:screenOrientation="portrait">
+
+        </activity>
+
+>>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
         <activity
             android:name=".ActivityLogin"
             android:screenOrientation="portrait"
@@ -39,23 +55,39 @@
             android:name=".ActivitySplash"
             android:screenOrientation="portrait"
             android:theme="@style/CalmTheme.NoActionBar">
+<<<<<<< HEAD
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+=======
+
+>>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
         </activity>
         <activity
             android:name=".ActivityMonitor"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="Exercise Monitor"
             android:screenOrientation="portrait"
+<<<<<<< HEAD
             android:theme="@style/CalmTheme.NoActionBar" />
+=======
+            android:theme="@style/CalmTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+>>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
         <activity
             android:name=".ActivityOtaDfu"
             android:hardwareAccelerated="false"
             android:label="Firmware Update"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+
+        </activity>
+
         <activity
             android:name=".ActivitySleep"
             android:label="Sleep Monitor"
