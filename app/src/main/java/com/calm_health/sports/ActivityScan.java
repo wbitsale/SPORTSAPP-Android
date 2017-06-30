@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ActivityScan extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener, BluetoothAdapter.LeScanCallback {
+    private final static String TAG = "scanactivity";
     Button btn_pair, btn_cancel;
     ImageView img_calm, img_rotate;
     private ListView deviceList;
@@ -52,7 +53,6 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
     int currentPos = -1;
     Bledevices currentBle;
     ObjectAnimator rotateAnimator;
-
 
     private boolean _checkPermission() {
         int nLog = ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.BLUETOOTH);
@@ -222,7 +222,9 @@ public class ActivityScan extends AppCompatActivity implements View.OnClickListe
     }
 
     private void stopScanBLE() {
+        Log.d(TAG,"stopScanBLE");
         if (mBluetoothAdapter != null) {
+            Log.d(TAG,"stopScanBLE: if");
             mBluetoothAdapter.stopLeScan(this);
             mBluetoothAdapter.cancelDiscovery();
         }

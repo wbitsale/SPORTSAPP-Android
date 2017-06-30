@@ -7,15 +7,13 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
+import com.calm_health.profile.BleManager;
+
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.UUID;
 
 import no.nordicsemi.android.log.Logger;
-
-import com.calm_health.parser.BodySensorLocationParser;
-import com.calm_health.parser.HeartRateMeasurementParser;
-import com.calm_health.profile.BleManager;
 
 /**
  * HRSManager class performs BluetoothGatt operations for connection, service discovery, enabling notification and reading characteristics. All operations required to connect to device with BLE HR
@@ -83,7 +81,7 @@ public class ECGManager extends BleManager<ECGManagerCallbacks> {
 
         @Override
         public void onCharacteristicRead(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
-            Logger.a(mLogSession, "\"" + BodySensorLocationParser.parse(characteristic) + "\" received");
+
 
             final String sensorPosition = getBodySensorPosition(characteristic.getValue()[0]);
             //This will send callback to HRSActivity when HR sensor position on body is found in HR device
@@ -100,7 +98,7 @@ public class ECGManager extends BleManager<ECGManagerCallbacks> {
 
         @Override
         public void onCharacteristicNotified(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
-            Logger.a(mLogSession, "\"" + HeartRateMeasurementParser.parse(characteristic) + "\" received");
+
             if (beforeTime == -1) beforeTime = System.currentTimeMillis();
 
             int hrValue;

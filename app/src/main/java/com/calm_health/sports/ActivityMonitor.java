@@ -2,16 +2,8 @@ package com.calm_health.sports;
 
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -21,20 +13,17 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import android.view.MenuItem;
-
-
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -43,30 +32,27 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.calm_health.profile.BleManager;
+import com.calm_health.profile.BleProfileActivity;
 import com.calm_health.sports.share.AppSharedPreferences;
 import com.github.gcacace.signaturepad.views.SignaturePad;
 import com.hero.ecgchart.ECGChart;
 
+import com.hero.ecgchart.PointData;
 import com.tool.sports.com.analysis.CalmAnalysisListener;
 import com.tool.sports.com.analysis.ProcessAnalysis;
 
-import java.util.List;
 import java.util.UUID;
 
 import at.grabner.circleprogress.CircleProgressView;
 
 
-public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapter.LeScanCallback, CalmAnalysisListener,
+public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisListener, ECGManagerCallbacks,
         NavigationView.OnNavigationItemSelectedListener {
     private final static String TAG = "monitoractivitylog";
     private static final int REQUEST_ENABLE_BT = 1;
     private final static int REQUEST_PERMISSION_REQ_CODE = 34; // any 8-bit number
-    private final static long SCAN_DURATION = 5000;
-    private final Handler mHandler = new Handler();
-    private boolean mIsScanning = false;
-    private BluetoothAdapter mBluetoothAdapter = null;
-    private BluetoothGatt mBluetoothGatt;
-    private BluetoothGattCharacteristic mNotifyCharacteristic;
+
     private ImageView mImgConnect;
     private final static String HR_SERVICE_UUID = "00002a37-0000-1000-8000-00805f9b34fb";
     private final static UUID CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
@@ -84,11 +70,11 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
 
     boolean isZoomed = false;
     boolean isRecord = false;
-    boolean isUserDisconnet = false;
+    boolean isUserDisconnect = false;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreateView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_monitor);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -106,65 +92,52 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         navigationView.getMenu().getItem(0).setChecked(true);
 
         initGui();
-//        getDevice();
+
         init_calmnessModule();
         _checkPermission();
+
     }
 
     private String mStrDeviceMacAddress;
 
-    private void getDevice() {
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void getDeviceFromPreference() {
         mStrDeviceMacAddress = AppSharedPreferences.getDeviceMacAddress(this);
         Toast.makeText(this, mStrDeviceMacAddress, Toast.LENGTH_SHORT).show();
         if (mStrDeviceMacAddress != "null") {
-            Log.d(TAG, "getDevice: " + mStrDeviceMacAddress);
-            initBLE();
-            startScanBLE();
+            Log.d(TAG, "getDeviceFromPreference: " + mStrDeviceMacAddress);
+            super.startScan(mStrDeviceMacAddress);
         } else {
             Toast.makeText(this, "Device is not registered.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void disconnect() {
-        Log.d(TAG, "disconnect function");
-        isUserDisconnet = true;
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.d(TAG, "disconnect function: mBluetoothGatt is null");
-            return;
-        }
-
-        Log.d(TAG, "disconnect function: mBluetoothGatt.disconnect()");
-        mBluetoothGatt.disconnect();
-        Log.d(TAG, "disconnect function: mBluetoothGatt.close()");
-        mBluetoothGatt.close();
-        Log.d(TAG, "disconnect function: mBluetoothGatt = null");
-        mBluetoothGatt = null;
-    }
 
     private static int mBatteryLevel = 0;
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         Log.d(TAG, "onPause");
-        disconnect();
-        super.onPause();
         AppSharedPreferences.setBatteryLevel(this, mBatteryLevel);
+        super.onPause();
     }
 
+    @Override
+    public void onDestroy() {
+        Log.i(TAG, "onDestroy");
+        AppSharedPreferences.setBatteryLevel(this, mBatteryLevel);
+        super.onDestroy();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onResume() {
         Log.i(TAG, "onResume");
-        isUserDisconnet = false;
-        getDevice();
+        isUserDisconnect = false;
+        getDeviceFromPreference();
         super.onResume();
     }
 
-    @Override
-    protected void onDestroy() {
-        Log.i(TAG, "onDestroy");
-        disconnect();
-        super.onDestroy();
-    }
 
     private boolean _checkPermission() {
         int nLog = ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.BLUETOOTH);
@@ -271,8 +244,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             if (doubleBackToExitPressedOnce) {
-                stopScanBLE();
-                disconnect();
+
                 super.onBackPressed();
                 return;
             }
@@ -287,6 +259,34 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
                 }
             }, 2000);
         }
+    }
+
+
+    @Override
+    protected BleManager<ECGManagerCallbacks> initializeManager() {
+        final ECGManager manager = ECGManager.getInstance(getApplicationContext());
+        manager.setGattCallbacks(this);
+        return manager;
+    }
+
+    @Override
+    protected void setDefaultUI() {
+
+    }
+
+    @Override
+    protected int getDefaultDeviceName() {
+        return 0;
+    }
+
+    @Override
+    protected int getAboutTextId() {
+        return 0;
+    }
+
+    @Override
+    protected UUID getFilterUUID() {
+        return null;
     }
 
     private void initGui() {
@@ -320,15 +320,16 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
             @Override
             public void onClick(View view) {
                 isRecord = !isRecord;
-                Toast.makeText(ActivityMonitor.this, "Test Mode ( Record btn event )", Toast.LENGTH_SHORT).show();
-                disconnect();
-//                if (isRecord) {
-//                    img_record.setBackgroundResource(R.drawable.status_recording);
-//                    tx_record.setText("Recording...");
-//                } else {
-//                    img_record.setBackgroundResource(R.drawable.status_record);
-//                    tx_record.setText("Record");
-//                }
+
+                if (isRecord) {
+                    img_record.setBackgroundResource(R.drawable.status_recording);
+                    tx_record.setText("Recording...");
+                    mCalmnessAnalysis.startCSVExport(mStrDeviceMacAddress.replace(":", "_"));
+                } else {
+                    img_record.setBackgroundResource(R.drawable.status_record);
+                    tx_record.setText("Record");
+                    mCalmnessAnalysis.stopCSVExport();
+                }
             }
         });
 
@@ -357,48 +358,12 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         }, 1000);
     }
 
-    private void initBLE() {
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-        }
-
-        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        if (mBluetoothAdapter == null) {
-            finish();
-            return;
-        }
-
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-    }
-
-    private void startScanBLE() {
-
-        if (mBluetoothAdapter.isEnabled()) {
-            mBluetoothAdapter.startLeScan(this);
-        } else {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-    }
-
-    private void stopScanBLE() {
-        if (mBluetoothAdapter != null) {
-            mBluetoothAdapter.stopLeScan(this);
-            mBluetoothAdapter.cancelDiscovery();
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(final int requestCode, final @NonNull String[] permissions, final @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_PERMISSION_REQ_CODE: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // We have been granted the Manifest.permission.ACCESS_COARSE_LOCATION permission. Now we may proceed with scanning.
-                    startScanBLE();
                 } else {
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
                 }
@@ -418,112 +383,6 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         }
     }
 
-    private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "onConnectionStateChange: STATE_CONNECTED");
-                mECGSweepChart.setConnection(true);
-                mBluetoothGatt.discoverServices();
-
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i(TAG, "onConnectionStateChange: STATE_DISCONNECTED");
-                mECGSweepChart.setConnection(false);
-                if (!isUserDisconnet)
-                    startScanBLE(); //retry connect
-            }
-        }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "onServicesDiscovered");
-                List<BluetoothGattService> services = gatt.getServices();
-                setCharacteristic(services, HR_SERVICE_UUID);
-            }
-        }
-
-        public void setCharacteristic(List<BluetoothGattService> gattServices, String uuid) {
-            if (gattServices == null) {
-                return;
-            }
-            for (BluetoothGattService gattService : gattServices) {
-                List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
-                for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                    if (gattCharacteristic.getUuid().toString().equals(uuid)) {
-                        // System.out.println("liufafa uuid-->"+uuid.toString());
-                        final int charaProp = gattCharacteristic.getProperties();
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-                            // If there is an active notification save_on a
-                            // characteristic, clear
-                            // it first so it doesn't update the data field save_on the
-                            // user interface.
-                            if (mNotifyCharacteristic != null) {
-                                // setCharacteristicNotification(mNotifyCharacteristic,
-                                // false);
-                                mNotifyCharacteristic = null;
-                            }
-                            readCharacteristic(gattCharacteristic);
-                        }
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                            mNotifyCharacteristic = gattCharacteristic;
-                            setCharacteristicNotification(gattCharacteristic, true);
-                        }
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i("connect", "Read");
-            }
-        }
-
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            Log.i("connect", "changed");
-            receiveData(characteristic);
-        }
-    };
-    long hrReceive = -1;
-    int hrNumber = 0;
-
-    public void receiveData(BluetoothGattCharacteristic characteristic) {
-        if (hrReceive == -1) hrReceive = System.currentTimeMillis();
-        long ellipse = System.currentTimeMillis() - hrReceive;
-        if (ellipse > 1000) {
-            hrReceive = System.currentTimeMillis();
-            Log.d("hrRec", "" + hrNumber);
-            hrNumber = 0;
-        }
-        int ecgVal;
-        boolean isSensorDetected;
-        isSensorDetected = isSensorDetected(characteristic.getValue()[0]);
-        setSensorDetectOnView(isSensorDetected);
-        int hrsCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
-        if (hrsCount == 0) return;
-//        Log.d(TAG, "" + hrsCount);
-        int sum = 0;
-        for (int i = 0; i < hrsCount; i++) {
-            ecgVal = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + i * 2);
-
-            if (ecgVal >= Math.pow(2, 15))
-                ecgVal = 1250;
-
-            mECGSweepChart.addEcgData(ecgVal);    //mInputBuf.addLast(ecgVal);
-            mCalmnessAnalysis.addEcgDataOne((double) ((ecgVal - 1200) / 800f));
-
-            hrNumber++;
-        }
-        int batteryAmount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2);
-        mBatteryLevel = calcBattery(batteryAmount);
-        int accX = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 2);
-        int accY = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 4);
-        int accZ = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 6);
-    }
-
     int nPercent = -1;
 
     public int calcBattery(int batteryAmount) {
@@ -538,11 +397,7 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         return nPercent;
     }
 
-    private boolean isSensorDetected(final byte value) {
-        return ((value & 0x01) != 0);
-    }
-
-    private void setSensorDetectOnView(final boolean _isSensorDetected) {
+    private void setDeviceConnectStateOnView(final boolean _isSensorDetected) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -554,61 +409,12 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         });
     }
 
-    public boolean setCharacteristicNotification(BluetoothGattCharacteristic characteristic, boolean enable) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            return false;
-        }
-        boolean ok = false;
-        if (mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
-            BluetoothGattDescriptor clientConfig = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
-            if (clientConfig != null) {
-                if (enable) {
-                    ok = clientConfig.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                } else {
-                    ok = clientConfig.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-                }
-                if (ok) {
-                    ok = mBluetoothGatt.writeDescriptor(clientConfig);
-                }
-            }
-        }
-        return ok;
-    }
-
-
-    public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            return;
-        }
-        mBluetoothGatt.readCharacteristic(characteristic);
-    }
-
-    @Override
-    public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-//        if (device == null) return;
-//        Log.d(TAG, "" + device.getName());
-        if (device != null && device.getName() != null) {
-            if (device.getName().toLowerCase().contains("calm")) {
-                if (device.getAddress().contentEquals(mStrDeviceMacAddress))
-                    connectBle(device);
-            }
-        }
-    }
-
-    public void connectBle(BluetoothDevice device) {
-        Log.d(TAG, "connectBle");
-        if (device != null) {
-            mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
-        }
-
-        stopScanBLE();
-
-    }
 
     @Override
     public void on_calm_result(double v) {
         Log.d(TAG, "clam: " + v);
-        mCircleCalm.setValue((float) v);
+//        mCircleCalm.setValue((float) v);
+        mCircleCalm.setValueAnimated((float) v);
     }
 
     @Override
@@ -622,6 +428,11 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
                 mHrtChart.update();
             }
         });
+    }
+
+    @Override
+    public void on_atrial_fibrillation_result(String strAF_result) {
+        Log.d(TAG, "on_atrial_fibrillation_result: " + strAF_result);
     }
 
     NavigationView navigationView;
@@ -646,5 +457,67 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawers();
         return true;
+    }
+
+    @Override
+    public void onHRSensorPositionFound(BluetoothDevice device, String position) {
+
+    }
+
+    boolean isConnect = false;
+
+    @Override
+    public void onHRValueReceived(BluetoothDevice device, int ecgVal, boolean isSensorDetected) {
+        isConnect = isSensorDetected;
+
+        if (ecgVal >= Math.pow(2, 15))
+            ecgVal = 0;
+        int nAF_NORMAL_UNKNOWN = mCalmnessAnalysis.addEcgDataOne(ecgVal);
+        if (nAF_NORMAL_UNKNOWN != ProcessAnalysis.IS_UNKNOWN) {
+            Log.d(TAG, "nAF_NORMAL_UNKNOWN:      " + nAF_NORMAL_UNKNOWN);
+        }
+        mECGSweepChart.addEcgData(new PointData(ecgVal, nAF_NORMAL_UNKNOWN));
+    }
+
+    @Override
+    public void onBatteryReceived(int batteryAmount) {
+        double fvolt = (double) batteryAmount / 4095 * 0.6 * 114 / 14;
+        Log.i("battery1", "" + fvolt);
+        int fpercent = (int) ((fvolt - 3.6) / (0.6) * 100);
+        if (fpercent <= 100 && fpercent >= 0) {
+            if (nPercent != -1)
+                fpercent = (fpercent + nPercent) / 2;
+            nPercent = fpercent;
+            mBatteryLevel = nPercent;
+//            Log.d(TAG, "onBatteryReceived: calced   " + nPercent);
+        }
+
+    }
+
+    @Override
+    public void onAccDataReceived(AccData data, boolean isSensorDeteted) {
+
+    }
+
+    @Override
+    public void onDeviceConnected(final BluetoothDevice device) {
+
+        setDeviceConnectStateOnView(true);
+        mECGSweepChart.setConnection(true);
+        super.onDeviceConnected(device);
+    }
+
+
+    @Override
+    public void onDeviceDisconnected(final BluetoothDevice device) {
+        setDeviceConnectStateOnView(false);
+        mECGSweepChart.setConnection(false);
+        super.onDeviceDisconnected(device);
+    }
+
+    @Override
+    public void onLinklossOccur(final BluetoothDevice device) {
+        setDeviceConnectStateOnView(false);
+        super.onLinklossOccur(device);
     }
 }

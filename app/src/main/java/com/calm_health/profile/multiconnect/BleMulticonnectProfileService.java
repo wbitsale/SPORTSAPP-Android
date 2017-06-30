@@ -16,6 +16,10 @@ import android.support.annotation.StringRes;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
+import com.calm_health.profile.BleManager;
+import com.calm_health.profile.BleManagerCallbacks;
+import com.calm_health.profile.ILogger;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,9 +27,6 @@ import java.util.List;
 
 import no.nordicsemi.android.log.ILogSession;
 import no.nordicsemi.android.log.LogContract;
-import com.calm_health.profile.BleManager;
-import com.calm_health.profile.BleManagerCallbacks;
-import com.calm_health.profile.ILogger;
 
 public abstract class BleMulticonnectProfileService extends Service implements BleManagerCallbacks {
 	@SuppressWarnings("unused")

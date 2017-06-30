@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat;
 import no.nordicsemi.android.support.v18.scanner.ScanCallback;
 import no.nordicsemi.android.support.v18.scanner.ScanFilter;

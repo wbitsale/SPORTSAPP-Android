@@ -26,15 +26,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.calm_health.scanner.ScannerFragment;
+import com.calm_health.sports.R;
+
 import java.util.UUID;
 
 import no.nordicsemi.android.log.ILogSession;
 import no.nordicsemi.android.log.LocalLogSession;
 import no.nordicsemi.android.log.Logger;
-
-import com.calm_health.scanner.ScannerFragment;
-import com.calm_health.sports.R;
-
 import no.nordicsemi.android.nrftoolbox.utility.DebugLogger;
 
 /**

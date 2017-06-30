@@ -17,6 +17,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.StringRes;
 
+import com.calm_health.utility.ParserUtils;
+
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -26,7 +28,6 @@ import no.nordicsemi.android.log.ILogSession;
 import no.nordicsemi.android.log.Logger;
 import no.nordicsemi.android.nrftoolbox.error.GattError;
 import no.nordicsemi.android.nrftoolbox.utility.DebugLogger;
-import com.calm_health.utility.ParserUtils;
 
 /**
  * <p>The BleManager is responsible for managing the low level communication with a Bluetooth Smart device. Please see profiles implementation for an example of use.
@@ -632,7 +633,7 @@ public abstract class BleManager<E extends BleManagerCallbacks> implements ILogg
 
 	/**
 	 * On Android, when multiple BLE operations needs to be done, it is required to wait for a proper
-	 * {@link android.bluetooth.BluetoothGattCallback BluetoothGattCallback} callback before calling
+	 * {@link BluetoothGattCallback BluetoothGattCallback} callback before calling
 	 * another operation. In order to make BLE operations easier the BleManager allows to enqueue a request
 	 * containing all data necessary for a given operation. Requests are performed one after another until the
 	 * queue is empty. Use static methods from below to instantiate a request and then enqueue them using {@link #enqueue(Request)}.

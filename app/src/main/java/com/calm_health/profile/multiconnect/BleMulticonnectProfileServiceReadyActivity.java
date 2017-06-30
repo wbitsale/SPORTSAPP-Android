@@ -23,6 +23,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.calm_health.profile.BleManagerCallbacks;
+import com.calm_health.scanner.ScannerFragment;
+import com.calm_health.sports.R;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,11 +36,6 @@ import no.nordicsemi.android.log.ILogSession;
 import no.nordicsemi.android.log.LocalLogSession;
 import no.nordicsemi.android.log.LogContract;
 import no.nordicsemi.android.log.Logger;
-
-import com.calm_health.profile.BleManagerCallbacks;
-import com.calm_health.scanner.ScannerFragment;
-import com.calm_health.sports.R;
-
 import no.nordicsemi.android.nrftoolbox.utility.DebugLogger;
 
 /**

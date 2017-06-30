@@ -23,8 +23,8 @@ public interface ECGManagerCallbacks extends BleManagerCallbacks {
 	 * @param value
 	 *            the new value
 	 */
-	void onHRValueReceived(final BluetoothDevice device, int value,boolean isSensorDeteted);
+	void onHRValueReceived(final BluetoothDevice device, int value, boolean isSensorDeteted);
 	void onBatteryReceived(int value);
 
-	void onAccDataReceived(AccData data,boolean isSensorDeteted);
+	void onAccDataReceived(AccData data, boolean isSensorDeteted);
 }

@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import com.calm_health.profile.BleManager;
 import com.calm_health.profile.BleProfileActivity;
+
 public class ECGActivity extends BleProfileActivity implements ECGManagerCallbacks {
 
     private final static String GRAPH_STATUS = "graph_status";
@@ -140,9 +141,21 @@ public class ECGActivity extends BleProfileActivity implements ECGManagerCallbac
     }
 
     @Override
-    public void onBatteryReceived(int value) {
-        setBatteryLevelOnView(value);
+    public void onBatteryReceived(int batteryAmount) {
+        double fvolt = (double) batteryAmount / 4095 * 0.6 * 114 / 14;
+        Log.i("battery1", "" + fvolt);
+        int fpercent = (int) ((fvolt - 3.6) / (0.6) * 100);
+        if (fpercent <= 100 && fpercent >= 0) {
+            if (nPercent != -1)
+                fpercent = (fpercent + nPercent) / 2;
+            nPercent = fpercent;
+        }
+
+        setBatteryLevelOnView(nPercent);
     }
+
+    int nPercent = -1;
+
 
     private void setGUI() {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -160,7 +173,7 @@ public class ECGActivity extends BleProfileActivity implements ECGManagerCallbac
 
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
     }
 
@@ -193,7 +206,7 @@ public class ECGActivity extends BleProfileActivity implements ECGManagerCallbac
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         stopShowGraph();
     }
@@ -220,13 +233,11 @@ public class ECGActivity extends BleProfileActivity implements ECGManagerCallbac
 
     void startShowGraph() {
         isGraphInProgress = true;
-
     }
 
     void stopShowGraph() {
         isGraphInProgress = false;
         setDefaultUI();
-
     }
 
     @Override
@@ -255,7 +266,7 @@ public class ECGActivity extends BleProfileActivity implements ECGManagerCallbac
     @Override
     public void onHRValueReceived(final BluetoothDevice device, int ecgVal, boolean isSensorDetected) {
         isConnect = isSensorDetected;
-        setDeviceConnectStateOnView();
+
         if (ecgVal >= Math.pow(2, 15)) {
 
             mChart.addEcgData(0);
@@ -325,12 +336,9 @@ public class ECGActivity extends BleProfileActivity implements ECGManagerCallbac
     protected void setDefaultUI() {
         mHRSValue.setText(R.string.not_available_value);
         mHRSPosition.setText(R.string.not_available);
-        mImgHrsConnect.setImageResource(R.drawable.disconnection);
+//        mImgHrsConnect.setImageResource(R.drawable.disconnection);
     }
 
-
-    public void onDebugStop(View v) {
-    }
 
     // set ui value
     private void setDebugStringOnView(final String str) {
@@ -346,8 +354,8 @@ public class ECGActivity extends BleProfileActivity implements ECGManagerCallbac
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (isConnect) mImgHrsConnect.setImageResource(R.drawable.connection);
-                else mImgHrsConnect.setImageResource(R.drawable.disconnection);
+//                if (isConnect) mImgHrsConnect.setImageResource(R.drawable.connection);
+//                else mImgHrsConnect.setImageResource(R.drawable.disconnection);
             }
         });
     }

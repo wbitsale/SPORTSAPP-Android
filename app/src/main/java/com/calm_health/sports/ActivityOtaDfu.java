@@ -88,8 +88,10 @@ import no.nordicsemi.android.support.v18.scanner.ScanSettings;
  * ActivityOtaDfu is the main DFU activity It implements DFUManagerCallbacks to receive callbacks from DFUManager class It implements
  * DeviceScannerFragment.OnDeviceSelectedListener callback to receive callback when device is selected from scanning dialog The activity supports portrait and
  * landscape orientations
+ *
+ *
  */
-public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks<Cursor>, ScannerFragment.OnDeviceSelectedListener,
+public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks<Cursor>,
         UploadCancelFragment.CancelFragmentListener, PermissionRationaleFragment.PermissionDialogListener {
     private static final String TAG = "ActivityOtaDfu";
 
@@ -136,6 +138,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     private int mFileType;
     private int mFileTypeTmp; // This value is being used when user is selecting a file not to overwrite the old value (in case he/she will cancel selecting file)
     private boolean mStatusOk;
+    private ProgressBar mProgressCircleFileDownload;
     /**
      * Flag set to true in {@link #onRestart()} and to false in {@link #onPause()}.
      */
@@ -164,36 +167,36 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         @Override
         public void onDeviceConnecting(final String deviceAddress) {
             mProgressBar.setIndeterminate(true);
-            mTextPercentage.setText(com.tool.sports.com.dfutool.R.string.dfu_status_connecting);
+            mTextPercentage.setText(R.string.dfu_status_connecting);
         }
 
         @Override
         public void onDfuProcessStarting(final String deviceAddress) {
             mProgressBar.setIndeterminate(true);
-            mTextPercentage.setText(com.tool.sports.com.dfutool.R.string.dfu_status_starting);
+            mTextPercentage.setText(R.string.dfu_status_starting);
         }
 
         @Override
         public void onEnablingDfuMode(final String deviceAddress) {
             mProgressBar.setIndeterminate(true);
-            mTextPercentage.setText(com.tool.sports.com.dfutool.R.string.dfu_status_switching_to_dfu);
+            mTextPercentage.setText(R.string.dfu_status_switching_to_dfu);
         }
 
         @Override
         public void onFirmwareValidating(final String deviceAddress) {
             mProgressBar.setIndeterminate(true);
-            mTextPercentage.setText(com.tool.sports.com.dfutool.R.string.dfu_status_validating);
+            mTextPercentage.setText(R.string.dfu_status_validating);
         }
 
         @Override
         public void onDeviceDisconnecting(final String deviceAddress) {
             mProgressBar.setIndeterminate(true);
-            mTextPercentage.setText(com.tool.sports.com.dfutool.R.string.dfu_status_disconnecting);
+            mTextPercentage.setText(R.string.dfu_status_disconnecting);
         }
 
         @Override
         public void onDfuCompleted(final String deviceAddress) {
-            mTextPercentage.setText(com.tool.sports.com.dfutool.R.string.dfu_status_completed);
+            mTextPercentage.setText(R.string.dfu_status_completed);
             if (mResumed) {
                 // let's wait a bit until we cancel the notification. When canceled immediately it will be recreated by service again.
                 new Handler().postDelayed(new Runnable() {
@@ -214,7 +217,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
         @Override
         public void onDfuAborted(final String deviceAddress) {
-            mTextPercentage.setText(com.tool.sports.com.dfutool.R.string.dfu_status_aborted);
+            mTextPercentage.setText(R.string.dfu_status_aborted);
             // let's wait a bit until we cancel the notification. When canceled immediately it will be recreated by service again.
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -232,11 +235,11 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         public void onProgressChanged(final String deviceAddress, final int percent, final float speed, final float avgSpeed, final int currentPart, final int partsTotal) {
             mProgressBar.setIndeterminate(false);
             mProgressBar.setProgress(percent);
-            mTextPercentage.setText(getString(com.tool.sports.com.dfutool.R.string.dfu_uploading_percentage, percent));
+            mTextPercentage.setText(getString(R.string.dfu_uploading_percentage, percent));
             if (partsTotal > 1)
-                mTextUploading.setText(getString(com.tool.sports.com.dfutool.R.string.dfu_status_uploading_part, currentPart, partsTotal));
+                mTextUploading.setText(getString(R.string.dfu_status_uploading_part, currentPart, partsTotal));
             else
-                mTextUploading.setText(com.tool.sports.com.dfutool.R.string.dfu_status_uploading);
+                mTextUploading.setText(R.string.dfu_status_uploading);
         }
 
         @Override
@@ -284,7 +287,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 FileHelper.createSamples(this);
             } else {
-                final DialogFragment dialog = PermissionRationaleFragment.getInstance(com.tool.sports.com.dfutool.R.string.permission_sd_text, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                final DialogFragment dialog = PermissionRationaleFragment.getInstance(R.string.permission_sd_text, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                 dialog.show(getSupportFragmentManager(), null);
             }
         }
@@ -370,6 +373,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         protected void onPreExecute() {
             super.onPreExecute();
             showDialog(progress_bar_type);
+            mProgressCircleFileDownload.setVisibility(View.VISIBLE);
         }
 
         /**
@@ -447,6 +451,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         protected void onPostExecute(String file_url) {
             // dismiss the dialog after the file was downloaded
             dismissDialog(progress_bar_type);
+            mProgressCircleFileDownload.setVisibility(View.INVISIBLE);
 
         }
 
@@ -505,21 +510,21 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         });
 
 
-        mDeviceNameView = (TextView) findViewById(com.tool.sports.com.dfutool.R.id.device_name);
-        mFileNameView = (TextView) findViewById(com.tool.sports.com.dfutool.R.id.file_name);
+        mDeviceNameView = (TextView) findViewById(R.id.device_name);
+        mFileNameView = (TextView) findViewById(R.id.file_name);
 
 
-        mUploadButton = (Button) findViewById(com.tool.sports.com.dfutool.R.id.action_upload);
+        mUploadButton = (Button) findViewById(R.id.action_upload);
 
 
-        mTextPercentage = (TextView) findViewById(com.tool.sports.com.dfutool.R.id.textviewProgress);
-        mTextUploading = (TextView) findViewById(com.tool.sports.com.dfutool.R.id.textviewUploading);
-        mProgressBar = (ProgressBar) findViewById(com.tool.sports.com.dfutool.R.id.progressbar_file);
+        mTextPercentage = (TextView) findViewById(R.id.textviewProgress);
+        mTextUploading = (TextView) findViewById(R.id.textviewUploading);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressbar_file);
 
         mProgressBar.getIndeterminateDrawable().setColorFilter(
                 Color.argb(250, 226, 20, 103),
                 PorterDuff.Mode.OVERLAY);
-
+        mProgressCircleFileDownload = (ProgressBar) findViewById(R.id.progressCircleFileDownload);
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (isDfuServiceRunning()) {
             // Restore image file information
@@ -572,7 +577,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
                     // We have been granted the Manifest.permission.WRITE_EXTERNAL_STORAGE permission. Now we may proceed with exporting.
                     FileHelper.createSamples(this);
                 } else {
-                    Toast.makeText(this, com.tool.sports.com.dfutool.R.string.no_required_permission, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.no_required_permission, Toast.LENGTH_SHORT).show();
                 }
                 break;
             }
@@ -581,7 +586,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
     private void isBLESupported() {
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            showToast(com.tool.sports.com.dfutool.R.string.no_ble);
+            showToast(R.string.no_ble);
             finish();
         }
     }
@@ -604,7 +609,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(com.tool.sports.com.dfutool.R.menu.settings_and_about, menu);
+        getMenuInflater().inflate(R.menu.settings_and_about, menu);
         return true;
     }
 
@@ -614,11 +619,11 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         if (i == android.R.id.home) {
             onBackPressed();
 
-        } else if (i == com.tool.sports.com.dfutool.R.id.action_about) {
-            final AppHelpFragment fragment = AppHelpFragment.getInstance(com.tool.sports.com.dfutool.R.string.dfu_about_text);
+        } else if (i == R.id.action_about) {
+            final AppHelpFragment fragment = AppHelpFragment.getInstance(R.string.dfu_about_text);
             fragment.show(getSupportFragmentManager(), "help_fragment");
 
-        } else if (i == com.tool.sports.com.dfutool.R.id.action_settings) {
+        } else if (i == R.id.action_settings) {
             final Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
@@ -753,14 +758,14 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
         // Ask the user for the Init packet file if HEX or BIN files are selected. In case of a ZIP file the Init packets should be included in the ZIP.
         if (statusOk && fileType != DfuService.TYPE_AUTO) {
-            new AlertDialog.Builder(this).setTitle(com.tool.sports.com.dfutool.R.string.dfu_file_init_title).setMessage(com.tool.sports.com.dfutool.R.string.dfu_file_init_message)
-                    .setNegativeButton(com.tool.sports.com.dfutool.R.string.no, new DialogInterface.OnClickListener() {
+            new AlertDialog.Builder(this).setTitle(R.string.dfu_file_init_title).setMessage(R.string.dfu_file_init_message)
+                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(final DialogInterface dialog, final int which) {
                             mInitFilePath = null;
                             mInitFileStreamUri = null;
                         }
-                    }).setPositiveButton(com.tool.sports.com.dfutool.R.string.yes, new DialogInterface.OnClickListener() {
+                    }).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(final DialogInterface dialog, final int which) {
                     final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -778,7 +783,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
      * @param view a button that was pressed
      */
     public void onSelectFileHelpClicked(final View view) {
-        new AlertDialog.Builder(this).setTitle(com.tool.sports.com.dfutool.R.string.dfu_help_title).setMessage(com.tool.sports.com.dfutool.R.string.dfu_help_message).setPositiveButton(com.tool.sports.com.dfutool.R.string.ok, null)
+        new AlertDialog.Builder(this).setTitle(R.string.dfu_help_title).setMessage(R.string.dfu_help_message).setPositiveButton(R.string.ok, null)
                 .show();
     }
 
@@ -849,23 +854,23 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
             startActivityForResult(intent, SELECT_FILE_REQ);
         } else {
             // there is no any file browser app, let's try to download one
-            final View customView = getLayoutInflater().inflate(com.tool.sports.com.dfutool.R.layout.app_file_browser, null);
+            final View customView = getLayoutInflater().inflate(R.layout.app_file_browser, null);
             final ListView appsList = (ListView) customView.findViewById(android.R.id.list);
             appsList.setAdapter(new FileBrowserAppsAdapter(this));
             appsList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             appsList.setItemChecked(0, true);
-            new AlertDialog.Builder(this).setTitle(com.tool.sports.com.dfutool.R.string.dfu_alert_no_filebrowser_title).setView(customView)
-                    .setNegativeButton(com.tool.sports.com.dfutool.R.string.no, new DialogInterface.OnClickListener() {
+            new AlertDialog.Builder(this).setTitle(R.string.dfu_alert_no_filebrowser_title).setView(customView)
+                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(final DialogInterface dialog, final int which) {
                             dialog.dismiss();
                         }
-                    }).setPositiveButton(com.tool.sports.com.dfutool.R.string.ok, new DialogInterface.OnClickListener() {
+                    }).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(final DialogInterface dialog, final int which) {
                     final int pos = appsList.getCheckedItemPosition();
                     if (pos >= 0) {
-                        final String query = getResources().getStringArray(com.tool.sports.com.dfutool.R.array.dfu_app_file_browser_action)[pos];
+                        final String query = getResources().getStringArray(R.array.dfu_app_file_browser_action)[pos];
                         final Intent storeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(query));
                         startActivity(storeIntent);
                     }
@@ -883,6 +888,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onUploadClicked(final View view) {
+        mProgressCircleFileDownload.setVisibility(View.VISIBLE);
         downloadFirmware();
         if (!mIsFound) {
             startScan();
@@ -896,7 +902,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
         // Check whether the selected file is a HEX file (we are just checking the extension)
         if (!mStatusOk) {
-            Toast.makeText(this, com.tool.sports.com.dfutool.R.string.dfu_file_status_invalid_message, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.dfu_file_status_invalid_message, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -963,42 +969,37 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
     }
 
-    @Override
+
     public void onDeviceSelected(final BluetoothDevice device, final String name) {
         mSelectedDevice = device;
         mUploadButton.setEnabled(mStatusOk);
-        mDeviceNameView.setText(name != null ? name : getString(com.tool.sports.com.dfutool.R.string.not_available));
+        mDeviceNameView.setText(name != null ? name : getString(R.string.not_available));
 
 
-    }
-
-    @Override
-    public void onDialogCanceled() {
-        // do nothing
     }
 
     private void showProgressBar() {
         mProgressBar.setVisibility(View.VISIBLE);
         mTextPercentage.setVisibility(View.VISIBLE);
         mTextPercentage.setText(null);
-        mTextUploading.setText(com.tool.sports.com.dfutool.R.string.dfu_status_uploading);
+        mTextUploading.setText(R.string.dfu_status_uploading);
 //		mTextUploading.setVisibility(View.VISIBLE);
 
 
         mUploadButton.setEnabled(true);
-        mUploadButton.setText(com.tool.sports.com.dfutool.R.string.dfu_action_upload_cancel);
+        mUploadButton.setText(R.string.dfu_action_upload_cancel);
     }
 
     private void onTransferCompleted() {
         clearUI(false);// clear ui without device connect
         mTextPercentage.setText("Done");
-        showToast(com.tool.sports.com.dfutool.R.string.dfu_success);
+        showToast(R.string.dfu_success);
         Toast.makeText(this,"Firmware has been updated successfully",Toast.LENGTH_LONG ).show();
     }
 
     public void onUploadCanceled() {
         clearUI(false);
-        showToast(com.tool.sports.com.dfutool.R.string.dfu_aborted);
+        showToast(R.string.dfu_aborted);
     }
 
     public void onBootloaderMode(final View view) {
@@ -1008,7 +1009,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     @Override
     public void onCancelUpload() {
         mProgressBar.setIndeterminate(true);
-        mTextUploading.setText(com.tool.sports.com.dfutool.R.string.dfu_status_aborting);
+        mTextUploading.setText(R.string.dfu_status_aborting);
         mTextPercentage.setText(null);
     }
 
@@ -1025,10 +1026,10 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         mProgressBar.setIndeterminate(false);
 
         mUploadButton.setEnabled(false); // enable Upload Button always
-        mUploadButton.setText(com.tool.sports.com.dfutool.R.string.dfu_action_upload);
+        mUploadButton.setText(R.string.dfu_action_upload);
         if (clearDevice) {
             mSelectedDevice = null;
-            mDeviceNameView.setText(com.tool.sports.com.dfutool.R.string.dfu_default_name);
+            mDeviceNameView.setText(R.string.dfu_default_name);
         }
         // Application may have lost the right to these files if Activity was closed during upload (grant uri permission). Clear file related values.
 //		mFileNameView.setText(null);
