@@ -51,6 +51,8 @@ import com.tool.sports.com.analysis.CalmAnalysisListener;
 import com.tool.sports.com.analysis.ProcessAnalysis;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import at.grabner.circleprogress.CircleProgressView;
@@ -85,6 +87,14 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
     boolean isZoomed = false;
     boolean isRecord = false;
     boolean isUserDisconnet = false;
+
+    int isECG = -1;
+    float accX = 0;
+    float accY = 0;
+    float accZ = 0;
+    int batteryAmount = 0;
+    int nPercent = -1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,15 +141,18 @@ public class ActivityMonitor extends AppCompatActivity implements BluetoothAdapt
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             return;
         }
+        mBluetoothGatt.disconnect();
         mBluetoothGatt.close();
         mBluetoothGatt = null;
     }
-private static int mBatteryLevel = 0;
+
+    private static int mBatteryLevel = 0;
+
     @Override
     protected void onPause() {
         disconnect();
         super.onPause();
-        AppSharedPreferences.setBatteryLevel(this,mBatteryLevel);
+        AppSharedPreferences.setBatteryLevel(this, mBatteryLevel);
     }
 
     @Override
@@ -152,7 +165,7 @@ private static int mBatteryLevel = 0;
     @Override
     protected void onDestroy() {
         Log.i(TAG, "destroy");
-        disconnect();
+//        disconnect();
         super.onDestroy();
     }
 
@@ -264,7 +277,7 @@ private static int mBatteryLevel = 0;
         } else {
             if (doubleBackToExitPressedOnce) {
                 stopScanBLE();
-                disconnect();
+//                disconnect();
                 super.onBackPressed();
                 return;
             }
@@ -317,6 +330,7 @@ private static int mBatteryLevel = 0;
                 if (isRecord) {
                     img_record.setBackgroundResource(R.drawable.status_recording);
                     tx_record.setText("Recording...");
+
                 } else {
                     img_record.setBackgroundResource(R.drawable.status_record);
                     tx_record.setText("Record");
@@ -352,6 +366,31 @@ private static int mBatteryLevel = 0;
                 mHrtChart.update();
             }
         }, 1000);
+
+        TimerTask drawEmitter = new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mECGSweepChart.setConnection(true);
+                        if (isECG == 0) {
+                            mECGSweepChart.setConnection(false);
+                            mImgConnect.setImageResource(R.drawable.status_disconnected);
+                        } else if (isECG == -1) {
+                            mECGSweepChart.setConnection(false);
+                            mImgConnect.setImageResource(R.drawable.status_disconnected);
+                        } else {
+                            mECGSweepChart.setConnection(true);
+                            mImgConnect.setImageResource(R.drawable.status_connected);
+
+                        }
+                    }
+                });
+            }
+        };
+        Timer timer = new Timer();
+        timer.schedule(drawEmitter, 0, 100);
     }
 
     private void initBLE() {
@@ -390,21 +429,6 @@ private static int mBatteryLevel = 0;
     }
 
     @Override
-    public void onRequestPermissionsResult(final int requestCode, final @NonNull String[] permissions, final @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_PERMISSION_REQ_CODE: {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // We have been granted the Manifest.permission.ACCESS_COARSE_LOCATION permission. Now we may proceed with scanning.
-                    startScanBLE();
-                } else {
-                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            }
-        }
-    }
-
-    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         // Checks the orientation of the screen for landscape and portrait and set portrait mode always
@@ -419,58 +443,22 @@ private static int mBatteryLevel = 0;
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "connected");
-                mECGSweepChart.setConnection(true);
+                Log.i("connect", "connected");
                 mBluetoothGatt.discoverServices();
-
+                updateView(1, 0, 0, 0, 0);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i(TAG, "disconnected");
-                mECGSweepChart.setConnection(false);
-                if (!isUserDisconnet)
-                    startScanBLE(); //retry connect
+                Log.i("connect", "disconnected");
+                updateView(-1, 0, 0, 0, 0);
             }
         }
-
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "discorverd");
+                Log.i("connect", "discorverd");
                 List<BluetoothGattService> services = gatt.getServices();
                 setCharacteristic(services, HR_SERVICE_UUID);
             }
         }
-
-        public void setCharacteristic(List<BluetoothGattService> gattServices, String uuid) {
-            if (gattServices == null) {
-                return;
-            }
-            for (BluetoothGattService gattService : gattServices) {
-                List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
-                for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                    if (gattCharacteristic.getUuid().toString().equals(uuid)) {
-                        // System.out.println("liufafa uuid-->"+uuid.toString());
-                        final int charaProp = gattCharacteristic.getProperties();
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-                            // If there is an active notification save_on a
-                            // characteristic, clear
-                            // it first so it doesn't update the data field save_on the
-                            // user interface.
-                            if (mNotifyCharacteristic != null) {
-                                // setCharacteristicNotification(mNotifyCharacteristic,
-                                // false);
-                                mNotifyCharacteristic = null;
-                            }
-                            readCharacteristic(gattCharacteristic);
-                        }
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                            mNotifyCharacteristic = gattCharacteristic;
-                            setCharacteristicNotification(gattCharacteristic, true);
-                        }
-                    }
-                }
-            }
-        }
-
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -484,44 +472,68 @@ private static int mBatteryLevel = 0;
             receiveData(characteristic);
         }
     };
-    long hrReceive = -1;
-    int hrNumber = 0;
+
+    public void setCharacteristic(List<BluetoothGattService> gattServices, String uuid) {
+        if (gattServices == null) {
+            return;
+        }
+        for (BluetoothGattService gattService : gattServices) {
+            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
+            for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
+                if (gattCharacteristic.getUuid().toString().equals(uuid)) {
+                    // System.out.println("liufafa uuid-->"+uuid.toString());
+                    final int charaProp = gattCharacteristic.getProperties();
+                    if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+                        // If there is an active notification save_on a
+                        // characteristic, clear
+                        // it first so it doesn't update the data field save_on the
+                        // user interface.
+                        if (mNotifyCharacteristic != null) {
+                            // setCharacteristicNotification(mNotifyCharacteristic,
+                            // false);
+                            mNotifyCharacteristic = null;
+                        }
+                        readCharacteristic(gattCharacteristic);
+                    }
+                    if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                        mNotifyCharacteristic = gattCharacteristic;
+                        setCharacteristicNotification(gattCharacteristic, true);
+                    }
+
+                }
+            }
+        }
+    }
 
     public void receiveData(BluetoothGattCharacteristic characteristic) {
-        if (hrReceive == -1) hrReceive = System.currentTimeMillis();
-        long ellipse = System.currentTimeMillis() - hrReceive;
-        if (ellipse > 1000) {
-            hrReceive = System.currentTimeMillis();
-            Log.d("hrRec", "" + hrNumber);
-            hrNumber = 0;
-        }
         int ecgVal;
         boolean isSensorDetected;
         isSensorDetected = isSensorDetected(characteristic.getValue()[0]);
-        setSensorDetectOnView(isSensorDetected);
+
         int hrsCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
         if (hrsCount == 0) return;
-//        Log.d(TAG, "" + hrsCount);
-        int sum = 0;
+        Log.d("ecg", "" + hrsCount);
         for (int i = 0; i < hrsCount; i++) {
             ecgVal = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + i * 2);
-
-            if (ecgVal >= Math.pow(2, 15))
+            if (ecgVal >= 2500)
                 ecgVal = 1250;
-
+            mCalmnessAnalysis.addEcgDataOne(ecgVal);
             mECGSweepChart.addEcgData(ecgVal);    //mInputBuf.addLast(ecgVal);
-            mCalmnessAnalysis.addEcgDataOne((double) ((ecgVal - 1200) / 800f));
-
-            hrNumber++;
         }
         int batteryAmount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2);
-        mBatteryLevel= calcBattery(batteryAmount);
         int accX = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 2);
         int accY = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 4);
         int accZ = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 6);
+        updateView(1, batteryAmount, accX, accY, accZ);
     }
 
-    int nPercent = -1;
+    public void updateView(int isECG, int batteryAmount, int accX, int accY, int accZ) {
+        this.isECG = isECG;
+        this.batteryAmount = batteryAmount;
+        this.accX = accX;
+        this.accY = accY;
+        this.accZ = accZ;
+    }
 
     public int calcBattery(int batteryAmount) {
         double fvolt = (double) batteryAmount / 4095 * 0.6 * 114 / 14;
@@ -583,7 +595,7 @@ private static int mBatteryLevel = 0;
     @Override
     public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
 //        if (device == null) return;
-//        Log.d(TAG, "" + device.getName());
+        Log.d("BLEDEV", "" + device.getName());
         if (device != null && device.getName() != null) {
             if (device.getName().toLowerCase().contains("calm")) {
                 if (device.getAddress().contentEquals(mStrDeviceMacAddress))
@@ -592,14 +604,18 @@ private static int mBatteryLevel = 0;
         }
     }
 
-    public void connectBle(BluetoothDevice device) {
+    public void connectBle(BluetoothDevice bledev) {
+        if (mBluetoothAdapter == null || bledev.getAddress() == null) {
+        }
+
+        final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(bledev.getAddress());
+        if (device == null) {
+        }
 
         if (device != null) {
             mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
         }
-
         stopScanBLE();
-
     }
 
     @Override
@@ -629,16 +645,25 @@ private static int mBatteryLevel = 0;
         int id = item.getItemId();
         if (id == R.id.nav_exercise) {
         } else if (id == R.id.nav_sleep) {
-
+            Intent intent = new Intent(ActivityMonitor.this, ActivitySleep.class);
+            startActivity(intent);
+            this.finish();
         } else if (id == R.id.nav_data) {
-
+            Intent intent = new Intent(ActivityMonitor.this, ActivityData.class);
+            startActivity(intent);
+            this.finish();
         } else if (id == R.id.nav_profile) {
+            Intent intent = new Intent(ActivityMonitor.this, ActivityProfile.class);
+            startActivity(intent);
+            this.finish();
 
         } else if (id == R.id.nav_setting) {
-            Intent intent = new Intent(ActivityMonitor.this, ActivityOtaDfu.class);
+            Intent intent = new Intent(ActivityMonitor.this, ActivitySettings.class);
             startActivity(intent);
+            this.finish();
         } else if (id == R.id.nav_exit) {
-
+            this.finish();
+            System.exit(0);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawers();
