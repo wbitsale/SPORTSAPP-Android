@@ -1,6 +1,7 @@
 package com.calm_health.sports;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.Dialog;
@@ -88,12 +89,10 @@ import no.nordicsemi.android.support.v18.scanner.ScanSettings;
  * ActivityOtaDfu is the main DFU activity It implements DFUManagerCallbacks to receive callbacks from DFUManager class It implements
  * DeviceScannerFragment.OnDeviceSelectedListener callback to receive callback when device is selected from scanning dialog The activity supports portrait and
  * landscape orientations
- *
- *
  */
 public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks<Cursor>,
         UploadCancelFragment.CancelFragmentListener, PermissionRationaleFragment.PermissionDialogListener {
-    private static final String TAG = "ActivityOtaDfu";
+    private static final String TAG = "ActivityOtaDfulog";
 
     private static final String PREFS_DEVICE_NAME = "no.nordicsemi.android.nrftoolbox.dfu.PREFS_DEVICE_NAME";
     private static final String PREFS_FILE_NAME = "no.nordicsemi.android.nrftoolbox.dfu.PREFS_FILE_NAME";
@@ -275,13 +274,12 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
             actionBar.setDisplayShowTitleEnabled(true);
         }
 
-
         isBLESupported();
         if (!isBLEEnabled()) {
             showBLEDialog();
         }
         setGUI();
-
+        downloadFirmware();
         // Try to create sample files
         if (FileHelper.newSamplesAvailable(this)) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -312,17 +310,16 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
         mPackage = new Package();
 
-
         mStrMacAddress = AppSharedPreferences.getDeviceMacAddress(this);
 
-        Log.d("dfubledevice", "value: " + mStrMacAddress);
+        Log.d(TAG, "getDevice: " + mStrMacAddress);
         if (mStrMacAddress != null) {
             // auto Find device after 1 second
             new Handler().postDelayed(
                     new Runnable() {
                         @RequiresApi(api = Build.VERSION_CODES.M)
                         public void run() {
-                            Log.i("tag", "This'll run 1000 milliseconds later");
+                            Log.i(TAG, "This'll run 1000 milliseconds later");
                             startScan();
                         }
                     },
@@ -337,33 +334,10 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     private static String mStr_file_src = "http://13.113.160.171/firmware/download";
     private static String mStr_file_dest = Environment.getExternalStorageDirectory().toString() + "/firmware.zip";
 
-    public void downloadFirmware() {
+    private void downloadFirmware() {
         new DownloadFileFromURL().execute(mStr_file_src);
         this.mFilePath = mStr_file_dest;
     }
-
-    private ProgressDialog pDialog;
-
-    @SuppressWarnings("deprecation")
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case progress_bar_type: // we set this to 0
-                pDialog = new ProgressDialog(this);
-                pDialog.setMessage("Downloading file. Please wait...");
-
-                pDialog.setIndeterminate(false);
-                pDialog.setMax(100);
-                pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                pDialog.setCancelable(true);
-                pDialog.show();
-                return pDialog;
-            default:
-                return null;
-        }
-    }
-
-    public static final int progress_bar_type = 0;
 
     private class DownloadFileFromURL extends AsyncTask<String, String, String> {
         /**
@@ -372,8 +346,8 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showDialog(progress_bar_type);
-            mProgressCircleFileDownload.setVisibility(View.VISIBLE);
+            showLoading();
+            Log.d(TAG, "start donwload firmware");
         }
 
         /**
@@ -395,7 +369,6 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
                 // download the file
                 InputStream input = new BufferedInputStream(url.openStream(),
                         8192);
-
                 // Output stream
                 OutputStream output = new FileOutputStream(mStr_file_dest);
 
@@ -408,7 +381,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
                     // publishing the progress....
                     // After this onProgressUpdate will be called
                     publishProgress("" + (int) ((total * 100) / lengthOfFile));
-
+                    Log.d(TAG, "" + (int) ((total * 100) / lengthOfFile));
                     // writing data to file
                     output.write(data, 0, count);
                 }
@@ -432,7 +405,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
          */
         protected void onProgressUpdate(String... progress) {
             // setting progress percentage
-            pDialog.setProgress(Integer.parseInt(progress[0]));
+//            pDialog.setProgress(Integer.parseInt(progress[0]));
             mFileNameView.setText("" + Integer.parseInt(progress[0]));
             mUploadButton.setEnabled(true);
 //
@@ -449,14 +422,11 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
          **/
         @Override
         protected void onPostExecute(String file_url) {
-            // dismiss the dialog after the file was downloaded
-            dismissDialog(progress_bar_type);
-            mProgressCircleFileDownload.setVisibility(View.INVISIBLE);
-
+            hideLoading();
+            Log.d(TAG, "Complete firmware download");
         }
 
     }//End DownloadFileFromURL
-
 
     @Override
     protected void onDestroy() {
@@ -480,43 +450,14 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     }
 
     private void setGUI() {
-
-        TextView tv_devicename = (TextView) findViewById(R.id.device_name);
-        TextView tv_devicemac = (TextView) findViewById(R.id.tf_deviceMac);
-        String deviceName = AppSharedPreferences.getDeviceName(this);
-        String deviceMac = AppSharedPreferences.getDeviceMacAddress(this);
-        deviceName = (deviceName != "null") ? deviceName : "Unknown";
-        deviceMac = (deviceMac != "null") ? deviceMac : "Unknown";
-        tv_devicename.setText(deviceName);
-        tv_devicemac.setText(deviceMac);
+        setDeviceInfo();
 
         lyt_battery = (LinearLayout) findViewById(R.id.lyt_battery);
         tx_battery = (TextView) findViewById(R.id.tx_battery);
-        final int nBattery = AppSharedPreferences.getBatteryLevel(this);
-        tx_battery.setText(nBattery + "%");
-        lyt_battery.post(new Runnable() {
-
-            @Override
-            public void run() {
-                int nWidth = lyt_battery.getWidth();
-                int nHeight = lyt_battery.getHeight();
-
-                int newWidth = nWidth * (100 - nBattery) / 100;
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        newWidth, nHeight);
-                lyt_battery.setLayoutParams(params);
-            }
-        });
-
 
         mDeviceNameView = (TextView) findViewById(R.id.device_name);
         mFileNameView = (TextView) findViewById(R.id.file_name);
-
-
         mUploadButton = (Button) findViewById(R.id.action_upload);
-
-
         mTextPercentage = (TextView) findViewById(R.id.textviewProgress);
         mTextUploading = (TextView) findViewById(R.id.textviewUploading);
         mProgressBar = (ProgressBar) findViewById(R.id.progressbar_file);
@@ -533,6 +474,17 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
             mStatusOk = true;
             showProgressBar();
         }
+    }
+
+    private void setDeviceInfo() {
+        TextView tv_devicename = (TextView) findViewById(R.id.device_name);
+        TextView tv_devicemac = (TextView) findViewById(R.id.tf_deviceMac);
+        String deviceName = AppSharedPreferences.getDeviceName(this);
+        String deviceMac = AppSharedPreferences.getDeviceMacAddress(this);
+        deviceName = (deviceName != "null") ? deviceName : "Unknown";
+        deviceMac = (deviceMac != "null") ? deviceMac : "Unknown";
+        tv_devicename.setText(deviceName);
+        tv_devicemac.setText(deviceMac);
     }
 
     @Override
@@ -600,11 +552,6 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     private void showBLEDialog() {
         final Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableIntent, ENABLE_BT_REQ);
-    }
-
-    private void showDeviceScanningDialog() {
-        final ScannerFragment dialog = ScannerFragment.getInstance((UUID) null); // Device that is advertising directly does not have the GENERAL_DISCOVERABLE nor LIMITED_DISCOVERABLE flag set.
-        dialog.show(getSupportFragmentManager(), "scan_fragment");
     }
 
     @Override
@@ -777,110 +724,22 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         }
     }
 
-    /**
-     * Called when the question mark was pressed
-     *
-     * @param view a button that was pressed
-     */
-    public void onSelectFileHelpClicked(final View view) {
-        new AlertDialog.Builder(this).setTitle(R.string.dfu_help_title).setMessage(R.string.dfu_help_message).setPositiveButton(R.string.ok, null)
-                .show();
+    private void showLoading() {
+        mProgressCircleFileDownload.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Called when Select File was pressed
-     *
-     * @param view a button that was pressed
-     */
-    public void onSelectFileClicked(final View view) {
-        mFileTypeTmp = mFileType;
-        int index = 0;
-        switch (mFileType) {
-            case DfuService.TYPE_AUTO:
-                index = 0;
-                break;
-            case DfuService.TYPE_SOFT_DEVICE:
-                index = 1;
-                break;
-            case DfuService.TYPE_BOOTLOADER:
-                index = 2;
-                break;
-            case DfuService.TYPE_APPLICATION:
-                index = 3;
-                break;
-        }
-        mFileTypeTmp = DfuService.TYPE_AUTO;
-        openFileChooser();
-//		// Show a dialog with file types
-//		new AlertDialog.Builder(this).setTitle(R.string.dfu_file_type_title)
-//				.setSingleChoiceItems(R.array.dfu_file_type, index, new DialogInterface.OnClickListener() {
-//					@Override
-//					public void onClick(final DialogInterface dialog, final int which) {
-//						switch (which) {
-//							case 0:
-//								mFileTypeTmp = DfuService.TYPE_AUTO;
-//								break;
-//							case 1:
-//								mFileTypeTmp = DfuService.TYPE_SOFT_DEVICE;
-//								break;
-//							case 2:
-//								mFileTypeTmp = DfuService.TYPE_BOOTLOADER;
-//								break;
-//							case 3:
-//								mFileTypeTmp = DfuService.TYPE_APPLICATION;
-//								break;
-//						}
-//					}
-//				}).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-//			@Override
-//			public void onClick(final DialogInterface dialog, final int which) {
-//				openFileChooser();
-//			}
-//		}).setNeutralButton(R.string.dfu_file_info, new DialogInterface.OnClickListener() {
-//			@Override
-//			public void onClick(final DialogInterface dialog, final int which) {
-//				final ZipInfoFragment fragment = new ZipInfoFragment();
-//				fragment.show(getSupportFragmentManager(), "help_fragment");
-//			}
-//		}).setNegativeButton(R.string.cancel, null).show();
+    private void hideLoading() {
+        mProgressCircleFileDownload.setVisibility(View.INVISIBLE);
     }
 
-    private void openFileChooser() {
-        final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType(mFileTypeTmp == DfuService.TYPE_AUTO ? DfuService.MIME_TYPE_ZIP : DfuService.MIME_TYPE_OCTET_STREAM);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            // file browser has been found on the device
-            startActivityForResult(intent, SELECT_FILE_REQ);
-        } else {
-            // there is no any file browser app, let's try to download one
-            final View customView = getLayoutInflater().inflate(R.layout.app_file_browser, null);
-            final ListView appsList = (ListView) customView.findViewById(android.R.id.list);
-            appsList.setAdapter(new FileBrowserAppsAdapter(this));
-            appsList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-            appsList.setItemChecked(0, true);
-            new AlertDialog.Builder(this).setTitle(R.string.dfu_alert_no_filebrowser_title).setView(customView)
-                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(final DialogInterface dialog, final int which) {
-                            dialog.dismiss();
-                        }
-                    }).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(final DialogInterface dialog, final int which) {
-                    final int pos = appsList.getCheckedItemPosition();
-                    if (pos >= 0) {
-                        final String query = getResources().getStringArray(R.array.dfu_app_file_browser_action)[pos];
-                        final Intent storeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(query));
-                        startActivity(storeIntent);
-                    }
-                }
-            }).show();
-        }
+    private void disableUploadBtn() {
+        mUploadButton.setBackgroundResource(R.drawable.radiusbuttondisable);
+        mUploadButton.setEnabled(false);
     }
 
-    public void onCalcelClicked(final View view) {
-
+    private void enableUploadBtn() {
+        mUploadButton.setBackgroundResource(R.drawable.radiusbuttonlight);
+        mUploadButton.setEnabled(true);
     }
 
     /**
@@ -888,8 +747,8 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onUploadClicked(final View view) {
-        mProgressCircleFileDownload.setVisibility(View.VISIBLE);
-        downloadFirmware();
+        Toast.makeText(this, "UPDATE", Toast.LENGTH_SHORT).show();
+//        downloadFirmware();
         if (!mIsFound) {
             startScan();
             return;
@@ -957,25 +816,10 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         fragment.show(getSupportFragmentManager(), TAG);
     }
 
-    /**
-     * Callback of CONNECT/DISCONNECT button on ActivityOtaDfu
-     */
-    public void onConnectClicked(final View view) {
-        if (isBLEEnabled()) {
-            showDeviceScanningDialog();
-        } else {
-            showBLEDialog();
-        }
-
-    }
-
-
     public void onDeviceSelected(final BluetoothDevice device, final String name) {
         mSelectedDevice = device;
         mUploadButton.setEnabled(mStatusOk);
         mDeviceNameView.setText(name != null ? name : getString(R.string.not_available));
-
-
     }
 
     private void showProgressBar() {
@@ -987,14 +831,16 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
 
         mUploadButton.setEnabled(true);
-        mUploadButton.setText(R.string.dfu_action_upload_cancel);
+
+
+
     }
 
     private void onTransferCompleted() {
         clearUI(false);// clear ui without device connect
         mTextPercentage.setText("Done");
         showToast(R.string.dfu_success);
-        Toast.makeText(this,"Firmware has been updated successfully",Toast.LENGTH_LONG ).show();
+        Toast.makeText(this, "Firmware has been updated successfully", Toast.LENGTH_LONG).show();
     }
 
     public void onUploadCanceled() {
@@ -1071,7 +917,8 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void startScan() {
-        Log.d("startscan", "begin");
+        showLoading();
+        Log.d(TAG, "startScan");
 //        mTextTitle.setText("Scanning device ...");
         clearUI(false);
         // Since Android 6.0 we need to obtain either Manifest.permission.ACCESS_COARSE_LOCATION or Manifest.permission.ACCESS_FINE_LOCATION to be able to scan for
@@ -1113,7 +960,8 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
      * Stop scan if user tap Cancel button
      */
     private void stopScan() {
-        Log.d("startscan", "stopScan");
+        hideLoading();
+        Log.d(TAG, "stopScan");
         if (mIsScanning) {
 
             final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
@@ -1121,13 +969,27 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
             mIsScanning = false;
             if (mIsFound) {
+                Log.d(TAG, "isFound");
 //                mTextPercentage.setText("Device Connected");
 //                mTextPercentage.setEnabled(true);
             } else {
-//                mTextTitle.setText("Cannot found device");
-                Toast.makeText(this,"Cannot found device",Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "not isFound");
+//                mTextTitle.setText("Please make sure the device is on.");
+                Toast.makeText(this, "Please make sure the device is on.", Toast.LENGTH_SHORT).show();
                 mUploadButton.setEnabled(true);
                 mUploadButton.setText("Retry");
+
+                mHandler.postDelayed(new Runnable() {
+                    @TargetApi(Build.VERSION_CODES.M)
+                    @Override
+                    public void run() {
+                        Log.d(TAG, "after " + 1000 + ", rescan");
+                        if (!mIsScanning) {
+                            startScan();
+                        }
+                    }
+                }, 1000);
+
             }
         }
     }
@@ -1154,6 +1016,9 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
                         onDeviceSelected(results.get(i).getDevice(), results.get(i).getDevice().getName());
 //                        mTextTitle.setText("" + results.get(i).getDevice().getName() + " Firmware Update");
                         mIsFound = true;
+                        setBattery();
+
+                        enableUploadBtn();
                         stopScan();
                         break;
                     }
@@ -1163,8 +1028,25 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
         @Override
         public void onScanFailed(final int errorCode) {
-
             // should never be called
         }
     };
+
+    private void setBattery() {
+        final int nBattery = AppSharedPreferences.getBatteryLevel(this);
+        tx_battery.setText(nBattery + "%");
+//        lyt_battery.post(new Runnable() {
+//            @Override
+//            public void run() {
+        int nWidth = lyt_battery.getWidth();
+        int nHeight = lyt_battery.getHeight();
+
+        int newWidth = nWidth * (100 - nBattery) / 100;
+        Log.d(TAG, "" + nWidth + ", " + newWidth);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                newWidth, nHeight);
+        lyt_battery.setLayoutParams(params);
+//            }
+//        });
+    }
 }
