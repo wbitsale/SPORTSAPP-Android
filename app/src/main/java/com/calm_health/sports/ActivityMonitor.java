@@ -442,17 +442,29 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
         Log.i("menu", "menu");
         int id = item.getItemId();
         if (id == R.id.nav_exercise) {
+//            Intent intent = new Intent(ActivityMonitor.this, ActivityMonitor.class);
+//            startActivity(intent);
+//            this.finish();
         } else if (id == R.id.nav_sleep) {
-
+            Intent intent = new Intent(ActivityMonitor.this, ActivitySleep.class);
+            startActivity(intent);
+            this.finish();
         } else if (id == R.id.nav_data) {
-
+            Intent intent = new Intent(ActivityMonitor.this, ActivityData.class);
+            startActivity(intent);
+            this.finish();
         } else if (id == R.id.nav_profile) {
+            Intent intent = new Intent(ActivityMonitor.this, ActivityProfile.class);
+            startActivity(intent);
+            this.finish();
 
         } else if (id == R.id.nav_setting) {
-            Intent intent = new Intent(ActivityMonitor.this, ActivityOtaDfu.class);
+            Intent intent = new Intent(ActivityMonitor.this, ActivitySettings.class);
             startActivity(intent);
+            this.finish();
         } else if (id == R.id.nav_exit) {
-
+            this.finish();
+            System.exit(0);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawers();
