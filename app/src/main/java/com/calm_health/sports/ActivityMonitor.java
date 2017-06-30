@@ -42,12 +42,6 @@ import com.hero.ecgchart.PointData;
 import com.tool.sports.com.analysis.CalmAnalysisListener;
 import com.tool.sports.com.analysis.ProcessAnalysis;
 
-<<<<<<< HEAD
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-=======
->>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
 import java.util.UUID;
 
 import at.grabner.circleprogress.CircleProgressView;
@@ -78,18 +72,7 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
     boolean isRecord = false;
     boolean isUserDisconnect = false;
 
-<<<<<<< HEAD
-    int isECG = -1;
-    float accX = 0;
-    float accY = 0;
-    float accZ = 0;
-    int batteryAmount = 0;
-    int nPercent = -1;
-
-
-=======
     @RequiresApi(api = Build.VERSION_CODES.M)
->>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
     @Override
     protected void onCreateView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_monitor);
@@ -130,19 +113,6 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
     }
 
 
-<<<<<<< HEAD
-    public void disconnect() {
-        isUserDisconnet = true;
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            return;
-        }
-        mBluetoothGatt.disconnect();
-        mBluetoothGatt.close();
-        mBluetoothGatt = null;
-    }
-
-=======
->>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
     private static int mBatteryLevel = 0;
 
     @Override
@@ -150,10 +120,6 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
         Log.d(TAG, "onPause");
         AppSharedPreferences.setBatteryLevel(this, mBatteryLevel);
         super.onPause();
-<<<<<<< HEAD
-        AppSharedPreferences.setBatteryLevel(this, mBatteryLevel);
-=======
->>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
     }
 
     @Override
@@ -165,18 +131,11 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
-<<<<<<< HEAD
-    protected void onDestroy() {
-        Log.i(TAG, "destroy");
-//        disconnect();
-        super.onDestroy();
-=======
     protected void onResume() {
         Log.i(TAG, "onResume");
         isUserDisconnect = false;
         getDeviceFromPreference();
         super.onResume();
->>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
     }
 
 
@@ -285,12 +244,7 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             if (doubleBackToExitPressedOnce) {
-<<<<<<< HEAD
-                stopScanBLE();
-//                disconnect();
-=======
 
->>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
                 super.onBackPressed();
                 return;
             }
@@ -370,11 +324,7 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
                 if (isRecord) {
                     img_record.setBackgroundResource(R.drawable.status_recording);
                     tx_record.setText("Recording...");
-<<<<<<< HEAD
-
-=======
                     mCalmnessAnalysis.startCSVExport(mStrDeviceMacAddress.replace(":", "_"));
->>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
                 } else {
                     img_record.setBackgroundResource(R.drawable.status_record);
                     tx_record.setText("Record");
@@ -406,36 +356,9 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
                 mHrtChart.update();
             }
         }, 1000);
-
-        TimerTask drawEmitter = new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mECGSweepChart.setConnection(true);
-                        if (isECG == 0) {
-                            mECGSweepChart.setConnection(false);
-                            mImgConnect.setImageResource(R.drawable.status_disconnected);
-                        } else if (isECG == -1) {
-                            mECGSweepChart.setConnection(false);
-                            mImgConnect.setImageResource(R.drawable.status_disconnected);
-                        } else {
-                            mECGSweepChart.setConnection(true);
-                            mImgConnect.setImageResource(R.drawable.status_connected);
-
-                        }
-                    }
-                });
-            }
-        };
-        Timer timer = new Timer();
-        timer.schedule(drawEmitter, 0, 100);
     }
 
     @Override
-<<<<<<< HEAD
-=======
     public void onRequestPermissionsResult(final int requestCode, final @NonNull String[] permissions, final @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_PERMISSION_REQ_CODE: {
@@ -450,7 +373,6 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
     }
 
     @Override
->>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         // Checks the orientation of the screen for landscape and portrait and set portrait mode always
@@ -461,105 +383,7 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
         }
     }
 
-<<<<<<< HEAD
-    private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i("connect", "connected");
-                mBluetoothGatt.discoverServices();
-                updateView(1, 0, 0, 0, 0);
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i("connect", "disconnected");
-                updateView(-1, 0, 0, 0, 0);
-            }
-        }
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i("connect", "discorverd");
-                List<BluetoothGattService> services = gatt.getServices();
-                setCharacteristic(services, HR_SERVICE_UUID);
-            }
-        }
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i("connect", "Read");
-            }
-        }
-
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            Log.i("connect", "changed");
-            receiveData(characteristic);
-        }
-    };
-
-    public void setCharacteristic(List<BluetoothGattService> gattServices, String uuid) {
-        if (gattServices == null) {
-            return;
-        }
-        for (BluetoothGattService gattService : gattServices) {
-            List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
-            for (final BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                if (gattCharacteristic.getUuid().toString().equals(uuid)) {
-                    // System.out.println("liufafa uuid-->"+uuid.toString());
-                    final int charaProp = gattCharacteristic.getProperties();
-                    if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-                        // If there is an active notification save_on a
-                        // characteristic, clear
-                        // it first so it doesn't update the data field save_on the
-                        // user interface.
-                        if (mNotifyCharacteristic != null) {
-                            // setCharacteristicNotification(mNotifyCharacteristic,
-                            // false);
-                            mNotifyCharacteristic = null;
-                        }
-                        readCharacteristic(gattCharacteristic);
-                    }
-                    if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-                        mNotifyCharacteristic = gattCharacteristic;
-                        setCharacteristicNotification(gattCharacteristic, true);
-                    }
-
-                }
-            }
-        }
-    }
-
-    public void receiveData(BluetoothGattCharacteristic characteristic) {
-        int ecgVal;
-        boolean isSensorDetected;
-        isSensorDetected = isSensorDetected(characteristic.getValue()[0]);
-
-        int hrsCount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
-        if (hrsCount == 0) return;
-        Log.d("ecg", "" + hrsCount);
-        for (int i = 0; i < hrsCount; i++) {
-            ecgVal = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + i * 2);
-            if (ecgVal >= 2500)
-                ecgVal = 1250;
-            mCalmnessAnalysis.addEcgDataOne(ecgVal);
-            mECGSweepChart.addEcgData(ecgVal);    //mInputBuf.addLast(ecgVal);
-        }
-        int batteryAmount = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2);
-        int accX = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 2);
-        int accY = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 4);
-        int accZ = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 2 + hrsCount * 2 + 6);
-        updateView(1, batteryAmount, accX, accY, accZ);
-    }
-
-    public void updateView(int isECG, int batteryAmount, int accX, int accY, int accZ) {
-        this.isECG = isECG;
-        this.batteryAmount = batteryAmount;
-        this.accX = accX;
-        this.accY = accY;
-        this.accZ = accZ;
-    }
-=======
     int nPercent = -1;
->>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
 
     public int calcBattery(int batteryAmount) {
         double fvolt = (double) batteryAmount / 4095 * 0.6 * 114 / 14;
@@ -585,63 +409,6 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
         });
     }
 
-<<<<<<< HEAD
-    public boolean setCharacteristicNotification(BluetoothGattCharacteristic characteristic, boolean enable) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            return false;
-        }
-        boolean ok = false;
-        if (mBluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
-            BluetoothGattDescriptor clientConfig = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
-            if (clientConfig != null) {
-                if (enable) {
-                    ok = clientConfig.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                } else {
-                    ok = clientConfig.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-                }
-                if (ok) {
-                    ok = mBluetoothGatt.writeDescriptor(clientConfig);
-                }
-            }
-        }
-        return ok;
-    }
-
-
-    public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            return;
-        }
-        mBluetoothGatt.readCharacteristic(characteristic);
-    }
-
-    @Override
-    public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-//        if (device == null) return;
-        Log.d("BLEDEV", "" + device.getName());
-        if (device != null && device.getName() != null) {
-            if (device.getName().toLowerCase().contains("calm")) {
-                if (device.getAddress().contentEquals(mStrDeviceMacAddress))
-                    connectBle(device);
-            }
-        }
-    }
-
-    public void connectBle(BluetoothDevice bledev) {
-        if (mBluetoothAdapter == null || bledev.getAddress() == null) {
-        }
-
-        final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(bledev.getAddress());
-        if (device == null) {
-        }
-
-        if (device != null) {
-            mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
-        }
-        stopScanBLE();
-    }
-=======
->>>>>>> 13823b6122f8f9af4e494b8df8acbd4d5870f043
 
     @Override
     public void on_calm_result(double v) {
@@ -676,25 +443,16 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
         int id = item.getItemId();
         if (id == R.id.nav_exercise) {
         } else if (id == R.id.nav_sleep) {
-            Intent intent = new Intent(ActivityMonitor.this, ActivitySleep.class);
-            startActivity(intent);
-            this.finish();
+
         } else if (id == R.id.nav_data) {
-            Intent intent = new Intent(ActivityMonitor.this, ActivityData.class);
-            startActivity(intent);
-            this.finish();
+
         } else if (id == R.id.nav_profile) {
-            Intent intent = new Intent(ActivityMonitor.this, ActivityProfile.class);
-            startActivity(intent);
-            this.finish();
 
         } else if (id == R.id.nav_setting) {
-            Intent intent = new Intent(ActivityMonitor.this, ActivitySettings.class);
+            Intent intent = new Intent(ActivityMonitor.this, ActivityOtaDfu.class);
             startActivity(intent);
-            this.finish();
         } else if (id == R.id.nav_exit) {
-            this.finish();
-            System.exit(0);
+
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawers();
