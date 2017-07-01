@@ -7,5 +7,6 @@ import android.bluetooth.BluetoothGatt;
  */
 
 public class GlobalVar {
-//    public static int nBattery = 0;
+    public static int nBattery = 0;
+    public static int nSleepMode = 0;
 }

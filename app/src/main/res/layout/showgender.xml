@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/rounddlg"
+    android:padding="10dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:text="Gender"
+        android:textSize="20dp"
+        android:textColor="#fff"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/nptitle" />
+
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="30dp">
+
+        <RadioButton
+            android:text="Male"
+            android:textColor="#ccc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="30dp"
+            android:buttonTint="#ccc"
+            android:id="@+id/radiomale" />
+
+        <RadioButton
+            android:text="Female"
+            android:textColor="#ccc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="#ccc"
+            android:id="@+id/radiofemale" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:id="@+id/btnyesg"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Yes"
+            android:textColor="#fff"
+            android:background="#00ffffff" />
+
+        <Button
+            android:id="@+id/btnnog"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:textColor="#ddd"
+            android:background="#00ffffff"
+            android:text="No" />
+    </LinearLayout>
+
+
+</LinearLayout>

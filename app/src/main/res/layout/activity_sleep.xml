@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingTop="55dip"
+        android:weightSum="2"
+        android:id="@+id/lyt_sleep">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:weightSum="6">
+
+            <LinearLayout
+                android:id="@+id/lyt_status_sleep"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1"
+                android:gravity="right|center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dip"
+                    android:gravity="right"
+                    android:text="Device Connect"
+                    android:textColor="#333"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="16dip"
+                    android:gravity="right">
+
+                    <ImageView
+                        android:id="@+id/img_connect_sleep"
+                        android:layout_width="16dp"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentRight="true"
+                        android:src="@drawable/status_disconnected" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tx_content_sleep"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:text="Set Wake Up Time"
+                android:textSize="35dip"/>
+
+            <TextView
+                android:id="@+id/textClock"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:textSize="42dip"
+                android:text="9:00 AM"/>
+            <TextView
+                android:id="@+id/tx_charge_sleep"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1"
+                android:text="Please keep your phone charged"
+                android:textColor="#999"
+                android:visibility="invisible"
+                android:gravity="center"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:weightSum="6">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="5">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dip"
+                    android:id="@+id/lyt_sleepstart">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Sleep"
+                        android:textSize="20dip" />
+
+                    <ImageButton
+                        android:id="@+id/btn_sleep"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:scaleType="fitCenter"
+                        android:background="#00000000"
+                        android:src="@drawable/sleep_on" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:id="@+id/lyt_sleepafter"
+                    android:visibility="invisible"
+                    android:weightSum="2">
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:padding="20dip"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Wake Now"
+                            android:textColor="#fff"
+                            android:id="@+id/tx_wake_sleep"
+                            android:textSize="24dip" />
+
+                        <ImageButton
+                            android:id="@+id/ibtn_wake"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:scaleType="fitCenter"
+                            android:background="#00000000"
+                            android:src="@drawable/icon_wake_up" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:padding="20dip"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Cancel"
+                            android:textColor="#fff"
+                            android:textSize="24dip"
+                            android:id="@+id/tx_cancel_sleep"/>
+
+                        <ImageButton
+                            android:id="@+id/btn_cancel_snooze"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:scaleType="fitCenter"
+                            android:background="#00000000"
+                            android:src="@drawable/icon_cancel" />
+                    </LinearLayout>
+                </LinearLayout>
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="150dip"
+                android:layout_height="0dip"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:background="#ddd"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip"
+                android:id="@+id/lyt_rington">
+
+                <ImageView
+                    android:layout_width="20dip"
+                    android:layout_height="20dip"
+                    android:src="@drawable/speaker" />
+
+                <TextView
+                    android:id="@+id/tx_rington"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dip"
+                    android:text="Select Rington"
+                    android:textColor="#333333" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <include
+        android:id="@+id/id_toolbar"
+        layout="@layout/app_bar_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="200dip"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:layout_marginTop="80dip"
+        android:descendantFocusability="blocksDescendants"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/activity_main_drawer" />
+
+
+</android.support.v4.widget.DrawerLayout>
