@@ -43,10 +43,7 @@
             android:name=".ActivitySplash"
             android:screenOrientation="portrait"
             android:theme="@style/CalmTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
         <activity
             android:name=".ActivityMonitor"
@@ -54,7 +51,10 @@
             android:label="Exercise Monitor"
             android:screenOrientation="portrait"
             android:theme="@style/CalmTheme.NoActionBar">
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ActivityOtaDfu"

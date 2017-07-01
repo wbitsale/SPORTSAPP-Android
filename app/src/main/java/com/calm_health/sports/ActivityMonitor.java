@@ -482,11 +482,14 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
     public void onHRValueReceived(BluetoothDevice device, int ecgVal, boolean isSensorDetected) {
         if (ecgVal >= Math.pow(2, 15))
             ecgVal = 0;
-        if (!isSensorDetected) ecgVal = 1250;
-        int nAF_NORMAL_UNKNOWN = mCalmnessAnalysis.addEcgDataOne(ecgVal);
-        if (nAF_NORMAL_UNKNOWN != ProcessAnalysis.IS_UNKNOWN) {
-            Log.d(TAG, "nAF_NORMAL_UNKNOWN:      " + nAF_NORMAL_UNKNOWN);
+
+        int nAF_NORMAL_UNKNOWN = ProcessAnalysis.IS_UNKNOWN;
+        if (isSensorDetected) {
+            nAF_NORMAL_UNKNOWN = mCalmnessAnalysis.addEcgDataOne(ecgVal);
+        } else {
+            ecgVal = 1250;
         }
+
         mECGSweepChart.addEcgData(new PointData(ecgVal, nAF_NORMAL_UNKNOWN));
     }
 
@@ -504,9 +507,56 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
 
     }
 
-    @Override
-    public void onAccDataReceived(AccData data, boolean isSensorDeteted) {
+    private static double k = 0.9;
+    private double lastHP_x = -1;
 
+    private double HP_x(int signal) {
+        if (lastHP_x == -1) {
+            lastHP_x = signal;
+            return lastHP_x;
+        }
+        double res = k * lastHP_x + signal - lastHP_x;
+        lastHP_x = res;
+        return res;
+    }
+
+    private double lastHP_y = -1;
+
+    private double HP_y(int signal) {
+        if (lastHP_y == -1) {
+            lastHP_y = signal;
+            return lastHP_y;
+        }
+        double res = k * lastHP_y + signal - lastHP_y;
+        lastHP_y = res;
+        return res;
+    }
+
+    private double lastHP_z = -1;
+
+    private double HP_z(int signal) {
+        if (lastHP_z == -1) {
+            lastHP_z = signal;
+            return lastHP_z;
+        }
+        double res = k * lastHP_z + signal - lastHP_z;
+        lastHP_z = res;
+        return res;
+    }
+
+
+    @Override
+    public void onAccDataReceived(AccData data, boolean isSensorDetected) {
+        Log.d(TAG, "acc: ," + data.x + ", " + data.y + ", " + data.z);
+        double hpX = HP_x(data.x);
+        double hpY = HP_y(data.y);
+        double hpZ = HP_z(data.z);
+
+        float m = (float) Math.sqrt(hpX * hpX + hpY * hpY + hpZ * hpZ);
+        float MM = m * 10;
+        MM = Math.min(0, MM);
+        MM = Math.max(100, MM);
+        mCircleMotion.setValueAnimated(MM);
     }
 
     @Override
