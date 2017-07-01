@@ -103,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dip"
                     android:layout_marginRight="5dip"
-                    android:text="50%"
+                    android:text="0%"
                     android:textColor="#050505" />
 
                 <RelativeLayout
