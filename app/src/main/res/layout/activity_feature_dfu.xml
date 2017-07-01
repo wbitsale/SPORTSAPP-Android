@@ -55,13 +55,6 @@
 
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/progressCircleFileDownload"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"/>
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -202,7 +195,7 @@
             android:layout_marginTop="10dip"
             android:background="@drawable/radiusbuttondark"
             android:enabled="false"
-            android:onClick="onCalcelClicked"
+            android:onClick="onCancelClicked"
             android:text="CANCEL"
             android:textAllCaps="true"
             android:textColor="#FFF" />

@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.app.Dialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -43,11 +42,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,9 +55,7 @@ import com.calm_health.sports.share.AppSharedPreferences;
 import com.tool.sports.com.dfutool.AppHelpFragment;
 import com.tool.sports.com.dfutool.DfuService;
 import com.tool.sports.com.dfutool.PermissionRationaleFragment;
-import com.tool.sports.com.dfutool.adapter.FileBrowserAppsAdapter;
 import com.tool.sports.com.dfutool.fragment.UploadCancelFragment;
-import com.tool.sports.com.dfutool.scanner.ScannerFragment;
 import com.tool.sports.com.dfutool.settings.SettingsActivity;
 import com.tool.sports.com.dfutool.settings.SettingsFragment;
 import com.tool.sports.com.dfutool.utility.FileHelper;
@@ -72,7 +69,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import no.nordicsemi.android.dfu.DfuProgressListener;
 import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
@@ -137,7 +133,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     private int mFileType;
     private int mFileTypeTmp; // This value is being used when user is selecting a file not to overwrite the old value (in case he/she will cancel selecting file)
     private boolean mStatusOk;
-    private ProgressBar mProgressCircleFileDownload;
+
     /**
      * Flag set to true in {@link #onRestart()} and to false in {@link #onPause()}.
      */
@@ -156,7 +152,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
      */
     private Package mPackage;
     /**
-     * The progress listener receives events from the DFU Service.
+     * The mProgress listener receives events from the DFU Service.
      * If is registered in onCreate() and unregistered in onDestroy() so methods here may also be called
      * when the screen is locked or the app went to the background. This is because the UI needs to have the
      * correct information after user comes back to the activity and this information can't be read from the service
@@ -301,7 +297,12 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
             mInitFileStreamUri = savedInstanceState.getParcelable(DATA_INIT_FILE_STREAM);
             mSelectedDevice = savedInstanceState.getParcelable(DATA_DEVICE);
             mStatusOk = mStatusOk || savedInstanceState.getBoolean(DATA_STATUS);
-            mUploadButton.setEnabled(mSelectedDevice != null && mStatusOk);
+
+            if (mSelectedDevice != null && mStatusOk) {
+                enableUploadBtn();
+            } else {
+                disableUploadBtn();
+            }
             mDfuCompleted = savedInstanceState.getBoolean(DATA_DFU_COMPLETED);
             mDfuError = savedInstanceState.getString(DATA_DFU_ERROR);
         }
@@ -309,11 +310,14 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         DfuServiceListenerHelper.registerProgressListener(this, mDfuProgressListener);
 
         mPackage = new Package();
+        getDevice();
+    }
 
+    private void getDevice() {
         mStrMacAddress = AppSharedPreferences.getDeviceMacAddress(this);
 
         Log.d(TAG, "getDevice: " + mStrMacAddress);
-        if (mStrMacAddress != null) {
+        if (mStrMacAddress != "null") {
             // auto Find device after 1 second
             new Handler().postDelayed(
                     new Runnable() {
@@ -346,8 +350,8 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showLoading();
-            Log.d(TAG, "start donwload firmware");
+            showLoading("Wait while firmware downloading ...");
+            Log.d(TAG, "start download firmware");
         }
 
         /**
@@ -363,7 +367,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
                 connection.connect();
 
                 // this will be useful so that you can show a typical 0-100%
-                // progress bar
+                // mProgress bar
                 int lengthOfFile = connection.getContentLength();
 
                 // download the file
@@ -378,10 +382,10 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
                 while ((count = input.read(data)) != -1) {
                     total += count;
-                    // publishing the progress....
+                    // publishing the mProgress....
                     // After this onProgressUpdate will be called
                     publishProgress("" + (int) ((total * 100) / lengthOfFile));
-                    Log.d(TAG, "" + (int) ((total * 100) / lengthOfFile));
+//                    Log.d(TAG, "" + (int) ((total * 100) / lengthOfFile));
                     // writing data to file
                     output.write(data, 0, count);
                 }
@@ -401,13 +405,12 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         }
 
         /**
-         * Updating progress bar
+         * Updating mProgress bar
          */
         protected void onProgressUpdate(String... progress) {
-            // setting progress percentage
-//            pDialog.setProgress(Integer.parseInt(progress[0]));
+            // setting mProgress percentage
+//            pDialog.setProgress(Integer.parseInt(mProgress[0]));
             mFileNameView.setText("" + Integer.parseInt(progress[0]));
-            mUploadButton.setEnabled(true);
 //
             mTextPercentage.setText("Downloading file. Please wait...");
             mTextPercentage.setEnabled(true);
@@ -418,7 +421,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         }
 
         /**
-         * After completing background task Dismiss the progress dialog
+         * After completing background task Dismiss the mProgress dialog
          **/
         @Override
         protected void onPostExecute(String file_url) {
@@ -451,7 +454,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
     private void setGUI() {
         setDeviceInfo();
-
+        mProgress = new ProgressDialog(this);
         lyt_battery = (LinearLayout) findViewById(R.id.lyt_battery);
         tx_battery = (TextView) findViewById(R.id.tx_battery);
 
@@ -463,9 +466,9 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         mProgressBar = (ProgressBar) findViewById(R.id.progressbar_file);
 
         mProgressBar.getIndeterminateDrawable().setColorFilter(
-                Color.argb(250, 226, 20, 103),
+                Color.rgb(00, 0x76, 0xFF),
                 PorterDuff.Mode.OVERLAY);
-        mProgressCircleFileDownload = (ProgressBar) findViewById(R.id.progressCircleFileDownload);
+
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (isDfuServiceRunning()) {
             // Restore image file information
@@ -701,7 +704,12 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
         final String extension = mFileType == DfuService.TYPE_AUTO ? "(?i)ZIP" : "(?i)HEX|BIN"; // (?i) =  case insensitive
         final boolean statusOk = mStatusOk = MimeTypeMap.getFileExtensionFromUrl(fileName).matches(extension);
-        mUploadButton.setEnabled(mSelectedDevice != null && statusOk);
+
+        if (mSelectedDevice != null && statusOk) {
+            enableUploadBtn();
+        } else {
+            disableUploadBtn();
+        }
 
         // Ask the user for the Init packet file if HEX or BIN files are selected. In case of a ZIP file the Init packets should be included in the ZIP.
         if (statusOk && fileType != DfuService.TYPE_AUTO) {
@@ -724,12 +732,22 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         }
     }
 
-    private void showLoading() {
-        mProgressCircleFileDownload.setVisibility(View.VISIBLE);
+    ProgressDialog mProgress;
+
+    private void showLoading(String str_Msg) {
+        hideLoading();
+        Log.d(TAG, "s howLoading");
+
+        mProgress.setTitle("Loading");
+        mProgress.setMessage(str_Msg); //"Wait while loading..."
+        mProgress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+//        mProgress.show();
     }
 
     private void hideLoading() {
-        mProgressCircleFileDownload.setVisibility(View.INVISIBLE);
+        Log.d(TAG, "h ideLoading");
+        if (mProgress != null)
+            mProgress.dismiss();
     }
 
     private void disableUploadBtn() {
@@ -748,7 +766,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onUploadClicked(final View view) {
         Toast.makeText(this, "UPDATE", Toast.LENGTH_SHORT).show();
-//        downloadFirmware();
+
         if (!mIsFound) {
             startScan();
             return;
@@ -767,7 +785,6 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
         // Save current state in order to restore it if user quit the Activity
         mProgressBar.setIndeterminate(true);
-
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         final SharedPreferences.Editor editor = preferences.edit();
@@ -806,6 +823,13 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         mTextPercentage.setVisibility(View.VISIBLE);
     }
 
+    public void onCancelClicked(final View v) {
+        Toast.makeText(ActivityOtaDfu.this, "Cancel", Toast.LENGTH_SHORT).show();
+        if (isDfuServiceRunning()) {
+            showUploadCancelDialog();
+        }
+    }
+
     private void showUploadCancelDialog() {
         final LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
         final Intent pauseAction = new Intent(DfuService.BROADCAST_ACTION);
@@ -820,6 +844,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         mSelectedDevice = device;
         mUploadButton.setEnabled(mStatusOk);
         mDeviceNameView.setText(name != null ? name : getString(R.string.not_available));
+
     }
 
     private void showProgressBar() {
@@ -829,9 +854,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         mTextUploading.setText(R.string.dfu_status_uploading);
 //		mTextUploading.setVisibility(View.VISIBLE);
 
-
-        mUploadButton.setEnabled(true);
-
+        enableUploadBtn();
 
 
     }
@@ -871,8 +894,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
         mProgressBar.setIndeterminate(false);
 
-        mUploadButton.setEnabled(false); // enable Upload Button always
-        mUploadButton.setText(R.string.dfu_action_upload);
+        disableUploadBtn();
         if (clearDevice) {
             mSelectedDevice = null;
             mDeviceNameView.setText(R.string.dfu_default_name);
@@ -917,8 +939,8 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void startScan() {
-        showLoading();
         Log.d(TAG, "startScan");
+        showLoading("Wait while Scanning device...");
 //        mTextTitle.setText("Scanning device ...");
         clearUI(false);
         // Since Android 6.0 we need to obtain either Manifest.permission.ACCESS_COARSE_LOCATION or Manifest.permission.ACCESS_FINE_LOCATION to be able to scan for
@@ -947,7 +969,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d("startscan", "after " + SCAN_DURATION + ", " + mIsScanning);
+                Log.d(TAG, "after " + SCAN_DURATION + ", " + mIsScanning);
                 if (mIsScanning) {
                     stopScan();
                 }
@@ -960,7 +982,6 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
      * Stop scan if user tap Cancel button
      */
     private void stopScan() {
-        hideLoading();
         Log.d(TAG, "stopScan");
         if (mIsScanning) {
 
@@ -969,6 +990,7 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
 
             mIsScanning = false;
             if (mIsFound) {
+                enableUploadBtn();
                 Log.d(TAG, "isFound");
 //                mTextPercentage.setText("Device Connected");
 //                mTextPercentage.setEnabled(true);
@@ -976,8 +998,6 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
                 Log.d(TAG, "not isFound");
 //                mTextTitle.setText("Please make sure the device is on.");
                 Toast.makeText(this, "Please make sure the device is on.", Toast.LENGTH_SHORT).show();
-                mUploadButton.setEnabled(true);
-                mUploadButton.setText("Retry");
 
                 mHandler.postDelayed(new Runnable() {
                     @TargetApi(Build.VERSION_CODES.M)
@@ -998,24 +1018,26 @@ public class ActivityOtaDfu extends AppCompatActivity implements LoaderCallbacks
         @Override
         public void onScanResult(final int callbackType, final ScanResult result) {
             // do nothing
-            Log.d("startscan", "onscan Result");
+            Log.d(TAG, "onScanResult");
         }
 
         @Override
         public void onBatchScanResults(final List<ScanResult> results) {
-            Log.d("startscan", "" + results.size());
+//            Log.d(TAG, "" + results.size());
             for (int i = 0; i < results.size(); i++) {
-                Log.d("startscan", results.get(i).getDevice().getAddress());
+
                 String strFoundMac = results.get(i).getDevice().getAddress();
+//                Log.d(TAG, strFoundMac + ", source: " + mStrMacAddress);
                 if (mStrMacAddress != null) {
                     if (mStrMacAddress.contentEquals(strFoundMac)) {
                         //khs
                         ImageView imgConnec = (ImageView) findViewById(R.id.img_ble_connect);
                         imgConnec.setImageResource(R.drawable.status_connected);
-                        Log.d("startscan", "Device selected");
+                        Log.d(TAG, "Device selected");
                         onDeviceSelected(results.get(i).getDevice(), results.get(i).getDevice().getName());
 //                        mTextTitle.setText("" + results.get(i).getDevice().getName() + " Firmware Update");
                         mIsFound = true;
+                        hideLoading();
                         setBattery();
 
                         enableUploadBtn();

@@ -419,12 +419,13 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
 
     @Override
     public void on_heart_rate_result(final double v) {
+        final double vHeartRate = Math.max(v, 200);
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mHrtChart.addPoint((float) v);
-                Log.d(TAG, "heartrate: " + v);
+                mHrtChart.addPoint((float) vHeartRate);
+                Log.d(TAG, "heartrate: " + vHeartRate);
                 mHrtChart.update();
             }
         });
@@ -476,14 +477,12 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
 
     }
 
-    boolean isConnect = false;
 
     @Override
     public void onHRValueReceived(BluetoothDevice device, int ecgVal, boolean isSensorDetected) {
-        isConnect = isSensorDetected;
-
         if (ecgVal >= Math.pow(2, 15))
             ecgVal = 0;
+        if (!isSensorDetected) ecgVal = 1250;
         int nAF_NORMAL_UNKNOWN = mCalmnessAnalysis.addEcgDataOne(ecgVal);
         if (nAF_NORMAL_UNKNOWN != ProcessAnalysis.IS_UNKNOWN) {
             Log.d(TAG, "nAF_NORMAL_UNKNOWN:      " + nAF_NORMAL_UNKNOWN);
@@ -493,13 +492,12 @@ public class ActivityMonitor extends BleProfileActivity implements CalmAnalysisL
 
     @Override
     public void onBatteryReceived(int batteryAmount) {
-        double fvolt = (double) batteryAmount / 4095 * 0.6 * 114 / 14;
-        Log.i("battery1", "" + fvolt);
-        int fpercent = (int) ((fvolt - 3.6) / (0.6) * 100);
-        if (fpercent <= 100 && fpercent >= 0) {
+        double fVolt = (double) batteryAmount / 4095 * 0.6 * 114 / 14;
+        int fPercent = (int) ((fVolt - 3.6) / (0.6) * 100);
+        if (fPercent <= 100 && fPercent >= 0) {
             if (nPercent != -1)
-                fpercent = (fpercent + nPercent) / 2;
-            nPercent = fpercent;
+                fPercent = (fPercent + nPercent) / 2;
+            nPercent = fPercent;
             mBatteryLevel = nPercent;
 //            Log.d(TAG, "onBatteryReceived: calced   " + nPercent);
         }

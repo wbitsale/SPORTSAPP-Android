@@ -23,19 +23,11 @@
         android:theme="@style/CalmTheme">
 
         <activity
-            android:name=".ECGActivity"
-            android:icon="@drawable/ic_hrs_feature"
-            android:label="@string/hrs_feature_title"
-            android:keepScreenOn="true"
-            android:screenOrientation="landscape">
-
-        </activity>
-        <activity
             android:name=".ActivityLoginScreen"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ActivityScan"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
 
         </activity>
 
@@ -53,7 +45,6 @@
             android:theme="@style/CalmTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -62,11 +53,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="Exercise Monitor"
             android:screenOrientation="portrait"
-            android:theme="@style/CalmTheme.NoActionBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:theme="@style/CalmTheme.NoActionBar">
+
         </activity>
         <activity
             android:name=".ActivityOtaDfu"
@@ -91,10 +79,11 @@
             android:label="Profile"
             android:screenOrientation="portrait"
             android:theme="@style/CalmTheme.NoActionBar" />
-        <activity android:name=".ActivityData"
+        <activity
+            android:name=".ActivityData"
             android:label="Data"
             android:screenOrientation="portrait"
-            android:theme="@style/CalmTheme.NoActionBar" ></activity>
+            android:theme="@style/CalmTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
